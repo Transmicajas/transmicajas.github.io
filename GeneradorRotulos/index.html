@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Rotulos Transmicajas</title>
+
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+
+
+</head>
+
+<body>
+
+    <div class="container mt-4">
+        <div class="contenedor-fijo">
+            <h2 class="text-center fw-bold titulo">Generador Rótulos Transmicajas</h2>
+
+            <!-- Botones de acción -->
+            <div class="button-container">
+                <!-- Botones para pantallas grandes -->
+                <div class="d-flex flex-column flex-md-row gap-2 mb-3 desktop-buttons">
+                    <button class="btn-custom" data-bs-toggle="modal" data-bs-target="#modal">
+                        <i class="bi bi-plus-lg"></i> Agregar
+                    </button>
+                    <button class="btn-custom" onclick="limpiarTabla()">
+                        <i class="bi bi-x-circle"></i> Limpiar Tabla
+                    </button>
+                    <button class="btn-custom" onclick="generarPDF()">
+                        <i class="bi bi-file-earmark-pdf"></i> Generar PDF
+                    </button>
+                    <button id="whatsapp-btn" class="btn-custom" onclick="enviarPorWhatsApp()">
+                        <i class="bi bi-whatsapp"></i> Enviar por WhatsApp
+                    </button>
+                    <button type="button" class="btn-custom" onclick="enviarDatos()">Enviar</button>
+                    <button type="button" class="btn-custom" onclick="recibirDatos()">Recibir</button>
+                    <button class="p-completa" onclick="toggleFullScreen()">Pantalla <br>Completa</button>
+                </div>
+
+                <!-- Botones para pantallas pequeñas -->
+                <div class="mobile-buttons">
+                    <button class="mobile-button-m" id="mobile-menu-button">
+                        <i class="bi bi-list"></i> <!-- Ícono de menú -->
+                    </button>
+                    <button class="mobile-button-a" id="mobile-add-button" data-bs-toggle="modal" data-bs-target="#modal">
+                        <i class="bi bi-plus-lg"></i> <!-- Ícono de agregar -->
+                    </button>
+                    <button class="p-completa-moviles" onclick="toggleFullScreen()">zoom</button>
+                </div>
+            </div>
+        </div>
+        <div id="pdf-container">
+            <div class="pdf-wrapper">
+                <button onclick="cerrarPDF()" class="close-btn-ifrPdf"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+</svg></button>
+                <iframe class="pdf-preview" id="pdf-preview"></iframe>
+            </div>
+        </div>
+
+
+
+        <!-- Tabla estilizada con Bootstrap -->
+        <div class="table-responsive margin-top">
+
+            <table class="table table-bordered table-hover shadow-sm rounded">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th class="codigo" data-full="Codigo" data-short="Cod">Código</th>
+                        <th class="factura" data-full="Factura" data-short="Fact">Factura</th>
+                        <th>Fecha</th>
+                        <th>PC</th>
+                        <th class="pc-iva" data-full="PC con IVA" data-short="PCi">PC con IVA</th>
+                        <th class="pc-formato" data-full="PC con Formato" data-short="PCf">PC con Formato</th>
+                        <th class="referencia" data-full="Referencia" data-short="REF">Referencia</th>
+                        <th class="acciones-col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <!-- Modal -->
+    <div id="modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm modal-md-lg"> <!-- Ajustamos el tamaño -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Registro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modal-form">
+                        <div class="row g-2 g-md-3"> <!-- Ajustamos el espaciado -->
+                            <!-- Campos en dos columnas -->
+                            <div class="col-6 mb-2 mb-md-3"> <!-- Ajustamos el margen inferior -->
+                                <label class="form-label">Código</label>
+                                <input type="text" id="codigo" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-6 mb-2 mb-md-3">
+                                <label class="form-label">Factura</label>
+                                <input type="text" id="factura" class="form-control form-control-sm" min="1" required>
+                            </div>
+                            <div class="col-6 mb-2 mb-md-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" id="fecha" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-6 mb-2 mb-md-3">
+                                <label class="form-label">Precio Compra</label>
+                                <input type="text" id="PC" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-6 mb-2 mb-md-3">
+                                <label class="form-label">PC + IVA</label>
+                                <input type="text" id="PC2" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-6 mb-2 mb-md-3">
+                                <label class="form-label">PC Con formato</label>
+                                <input type="text" id="PC3" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-6 mb-2 mb-md-3">
+                                <label class="form-label">Referencia</label>
+                                <input type="text" id="ref" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <label for="cantidad" class="me-2">Cantidad:</label>
+                    <input type="number" id="cantidad" class="form-control form-control-sm" style="width: 80px;" min="1"
+                        max="44" value="1">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="guardarRegistro()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="whatsappModalLabel">Atención</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    Primero genera el PDF antes de enviarlo por WhatsApp.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner de carga -->
+    <!-- Spinner de carga -->
+    <div id="loadingContainer" class="loading-overlay" style="display: none;">
+        <div id="spinner" class="spinner"></div>
+        <div id="successCheck" class="success-check" style="display: none;">
+            ✔
+        </div>
+    </div>
+
+
+
+    <!-- Modal de error -->
+    <div id="errorModal" class="modal-error">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar -->
+    <div id="modalEliminar" class="modal fade modal-eliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar Registro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar este registro?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- <iframe id="pdf-preview" width="100%" height="500px"></iframe> -->
+    <script>
+        document.addEventListener("keydown", function (event) {
+            if (event.code === "Space") {
+                event.preventDefault(); // Evita que la página se desplace al presionar la barra espaciadora
+
+                let modalElement = document.getElementById('modal');
+                let modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+
+                if (modalElement.classList.contains("show")) {
+                    modalInstance.hide(); // Si el modal está abierto, lo cierra
+                } else {
+                    modalInstance.show(); // Si está cerrado, lo abre
+                }
+            }
+        });
+        document.getElementById('modal').addEventListener('shown.bs.modal', function () {
+            // Colocar el foco en el campo "Código"
+            document.getElementById('codigo').focus();
+
+            // Obtener el campo de fecha y asignar la fecha actual si está vacío
+            let fechaInput = document.getElementById('fecha');
+            let hoy = new Date();
+            let año = hoy.getFullYear();
+            let mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            let dia = String(hoy.getDate()).padStart(2, '0');
+            let fechaActual = `${año}-${mes}-${dia}`;
+            if (!fechaInput.value) {
+                fechaInput.value = fechaActual;
+            }
+        });
+
+        // Detectar la tecla Enter cuando el modal está abierto
+        document.addEventListener("keydown", function (event) {
+            let modalElement = document.getElementById('modal');
+
+            if (modalElement.classList.contains("show") && event.key === "Enter") {
+                event.preventDefault(); // Evita el envío accidental de formularios
+                guardarRegistro(); // Llama a la función de guardado
+            }
+        });
+
+        function mostrarPDF(url) {
+            document.getElementById('pdf-preview').src = url;
+            document.getElementById('pdf-container').style.display = 'flex';
+        }
+        function cerrarPDF() {
+            const pdfContainer = document.getElementById('pdf-container');
+            const pdfPreview = document.getElementById('pdf-preview');
+
+            // Agrega la clase para la animación de cierre
+            pdfContainer.classList.add('closing');
+
+            // Espera a que termine la animación (300ms)
+            setTimeout(() => {
+                // Oculta el contenedor
+                pdfContainer.style.display = 'none';
+                // Limpia la fuente del iframe
+                pdfPreview.src = '';
+                // Remueve la clase de animación
+                pdfContainer.classList.remove('closing');
+            }, 300);
+        }
+
+
+
+
+
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function actualizarEncabezados() {
+            let pantallaPequena = window.innerWidth <= 767;
+            document.querySelector(".codigo").textContent = pantallaPequena
+                ? document.querySelector(".codigo").dataset.short
+                : document.querySelector(".codigo").dataset.full;
+
+            document.querySelector(".factura").textContent = pantallaPequena
+                ? document.querySelector(".factura").dataset.short
+                : document.querySelector(".factura").dataset.full;
+
+            document.querySelector(".pc-iva").textContent = pantallaPequena
+                ? document.querySelector(".pc-iva").dataset.short
+                : document.querySelector(".pc-iva").dataset.full;
+
+            document.querySelector(".pc-formato").textContent = pantallaPequena
+                ? document.querySelector(".pc-formato").dataset.short
+                : document.querySelector(".pc-formato").dataset.full;
+
+            document.querySelector(".referencia").textContent = pantallaPequena
+                ? document.querySelector(".referencia").dataset.short
+                : document.querySelector(".referencia").dataset.full;
+        }
+
+        window.addEventListener("resize", actualizarEncabezados);
+        document.addEventListener("DOMContentLoaded", actualizarEncabezados);
+
+
+        document.getElementById('mobile-menu-button').addEventListener('click', function (event) {
+            event.stopPropagation(); // Evita que el clic se propague y cierre el menú inmediatamente
+
+            // Verifica si el menú ya está abierto
+            const existingMenu = document.querySelector('.mobile-menu');
+            if (existingMenu) {
+                existingMenu.remove(); // Cierra el menú si ya está abierto
+                return;
+            }
+
+            // Crea el menú desplegable
+            const menu = document.createElement('div');
+            menu.className = 'mobile-menu';
+            menu.innerHTML = `
+        <div class="mobile-menu-content">
+            <button class="mobile-menu-item" onclick="enviarDatos()">
+                <i class="bi bi-send"></i> <!-- Ícono de enviar -->
+            </button>
+            <button class="mobile-menu-item" onclick="recibirDatos()">
+                <i class="bi bi-download"></i> <!-- Ícono de recibir -->
+            </button>
+            <button class="mobile-menu-item" onclick="generarPDF()">
+                <i class="bi bi-file-earmark-pdf"></i> <!-- Ícono de PDF -->
+            </button>
+            <button class="mobile-menu-item" onclick="enviarPorWhatsApp()">
+                <i class="bi bi-whatsapp"></i> <!-- Ícono de WhatsApp -->
+            </button>
+            <button class="mobile-menu-item" onclick="limpiarTabla()">
+                <i class="bi bi-trash"></i> <!-- Ícono de limpiar -->
+            </button>
+        </div>
+    `;
+            document.body.appendChild(menu);
+
+            // Cierra el menú al hacer clic fuera de él
+            document.addEventListener('click', function closeMenu(event) {
+                if (!menu.contains(event.target) && event.target.id !== 'mobile-menu-button') {
+                    menu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        });
+
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="script.js"></script>
+    <script src="pdf.js"></script>
+</body>
+
+</html>
