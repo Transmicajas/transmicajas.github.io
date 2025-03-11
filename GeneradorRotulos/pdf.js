@@ -51,7 +51,7 @@ function generarPDF() {
     doc.text(`TRM: ${fila[1]}`, x + 15, y + 11);
     doc.text(`${fila[2]}`, x + 5, y + 15);
     doc.setTextColor(255, 0, 0);
-    doc.text(`|PC ${fila[5]}`, x + 25, y + 15);
+    doc.text(`| ${fila[5]}`, x + 25, y + 15);
     doc.setTextColor(0, 0, 0);
     doc.text(`REF: ${fila[6]}`, x + 5, y + 20);
 
