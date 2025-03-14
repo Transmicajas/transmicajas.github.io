@@ -25,26 +25,38 @@
             <!-- Botones de acción -->
             <div class="button-container">
                 <!-- Botones para pantallas grandes -->
-                <div class="d-flex flex-column flex-md-row gap-2 mb-3 desktop-buttons">
-                    <button class="btn-custom" data-bs-toggle="modal" data-bs-target="#modal">
-                        <i class="bi bi-plus-lg"></i> Agregar
-                    </button>
-                    <button class="btn-custom" onclick="limpiarTabla()">
-                        <i class="bi bi-x-circle"></i> Limpiar Tabla
-                    </button>
-                    <button class="btn-custom" onclick="generarPDF()">
-                        <i class="bi bi-file-earmark-pdf"></i> Generar PDF
-                    </button>
-                    <button class="btn-custom" onclick="generarPDF2()">
-                        <i class="bi bi-file-earmark-pdf"></i> PDF(MargenArriba)
-                    </button>
-
-                    <button id="whatsapp-btn" class="btn-custom" onclick="enviarPorWhatsApp()">
-                        <i class="bi bi-whatsapp"></i> Enviar por WhatsApp
-                    </button>
-                    <button type="button" class="btn-custom" onclick="enviarDatos()">Enviar</button>
-                    <button type="button" class="btn-custom" onclick="recibirDatos()">Recibir</button>
-                    <button class="p-completa" onclick="toggleFullScreen()">Pantalla <br>Completa</button>
+                <div class="button-container">
+                    <div class="d-flex flex-column flex-md-row gap-2 mb-3 desktop-buttons">
+                        <button class="btn-custom" data-bs-toggle="modal" data-bs-target="#modal">
+                            <i class="bi bi-plus-lg"></i> Agregar
+                        </button>
+                        <button class="btn-custom" onclick="limpiarTabla()">
+                            <i class="bi bi-x-circle"></i> Limpiar Tabla
+                        </button>
+                        <button class="btn-custom" onclick="generarPDF()">
+                            <i class="bi bi-file-earmark-pdf"></i> Generar PDF
+                        </button>
+                        <button class="btn-custom" onclick="generarPDF2()">
+                            <i class="bi bi-file-earmark-pdf"></i> PDF(MargenArriba)
+                        </button>
+                        <button id="whatsapp-btn" class="btn-custom" onclick="enviarPorWhatsApp()">
+                            <i class="bi bi-whatsapp"></i> Enviar por WhatsApp
+                        </button>
+                        <button id="btn-eliminar-varios" class="btn-custom btn-danger" onclick="toggleEliminarVarios()">
+                            <i class="bi bi-trash"></i> Eliminar Varios
+                        </button>
+                        <button id="btn-confirmar-eliminar" class="btn-custom btn-danger"
+                            onclick="eliminarSeleccionados()" style="display: none;">
+                            <i class="bi bi-check"></i> Confirmar Eliminación
+                        </button>
+                        <button type="button" class="btn-custom" onclick="enviarDatos()">Enviar</button>
+                        <button type="button" class="btn-custom" onclick="recibirDatos()">Recibir</button>
+                        <button class="p-completa" onclick="toggleFullScreen()">Pantalla <br>Completa</button>
+                        <button id="cancelar-eliminar" class="btn-custom cancelar-seleccion" style="display: none;"
+                            onclick="cancelarEliminacionMultiple()">
+                            <i class="bi bi-x-circle"></i> Cancelar Selección
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Botones para pantallas pequeñas -->
@@ -212,6 +224,23 @@
         </div>
     </div>
 
+    <!-- Modal para "No has seleccionado ninguna fila" -->
+    <div id="modal-no-seleccion" class="custom-modal">
+        <div class="custom-modal-content">
+            <p>No has seleccionado ninguna fila para eliminar.</p>
+            <button id="cerrar-modal-no-seleccion" class="custom-modal-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div id="modal-confirmar-eliminar" class="custom-modal">
+        <div class="custom-modal-content">
+            <p>¿Estás seguro de que deseas eliminar las filas seleccionadas?</p>
+            <button id="confirmar-eliminar" class="custom-modal-btn confirmar">Eliminar</button>
+            <button id="cancelar-eliminar-modal" class="custom-modal-btn cancelar">Cancelar</button>
+        </div>
+    </div>
+
 
 
     <!-- <iframe id="pdf-preview" width="100%" height="500px"></iframe> -->
@@ -277,10 +306,6 @@
                 pdfContainer.classList.remove('closing');
             }, 300);
         }
-
-
-
-
 
 
         function toggleFullScreen() {
