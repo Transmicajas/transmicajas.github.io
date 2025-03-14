@@ -1,4 +1,4 @@
-function generarPDF() {
+function generarPDF2() {
   const { jsPDF } = window.jspdf;
   doc = new jsPDF({ format: "letter", orientation: "portrait" }); // Asignamos a la variable global
 
@@ -6,9 +6,9 @@ function generarPDF() {
   let pageHeight = doc.internal.pageSize.height;
 
   let cols = 4; // Número de columnas
-  let rows = 11; // Número de filas por página
+  let rows = 10; // Número de filas por página
   let xStart = 0,
-    yStart = 25; // Posición inicial
+    yStart = 22; // Posición inicial
   let width = pageWidth / cols; // Ancho de cada etiqueta
   let height = pageHeight / rows; // Alto de cada etiqueta
 
