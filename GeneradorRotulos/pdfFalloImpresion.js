@@ -52,7 +52,7 @@ function generarPDF2() {
     // Textos
     doc.setFont("helvetica", "bold");
     doc.text(`${fila[0]}`, x + 7, y + 11); // Ajustado para no salirse del cuadro
-    doc.text(`TRM: ${fila[1]}`, x + 25, y + 11); // Ajustado para no salirse del cuadro
+    doc.text(`TRM: ${fila[1]}`, x + 20, y + 11); // Ajustado para no salirse del cuadro
     doc.text(`${fila[2]}`, x + 7, y + 15); // Ajustado para no salirse del cuadro
     doc.setTextColor(255, 0, 0);
     doc.text(`| ${fila[5]}`, x + 26, y + 15); // Ajustado para no salirse del cuadro
