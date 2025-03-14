@@ -8,7 +8,7 @@ function generarPDF2() {
   let cols = 4; // Número de columnas
   let rows = 10; // Número de filas por página
   let xStart = 0,
-    yStart = 22; // Posición inicial
+    yStart = 18; // Posición inicial
   let width = pageWidth / cols; // Ancho de cada etiqueta
   let height = pageHeight / rows; // Alto de cada etiqueta
 
