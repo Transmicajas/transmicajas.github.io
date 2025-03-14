@@ -85,7 +85,6 @@ function guardarRegistro() {
 function agregarFila(tablaBody, codigo, factura, fecha, PC, PC2, PC3, ref) {
   let nuevaFila = document.createElement("tr");
 
-  // Asegurar que PC y PC2 tengan formato con separador de miles y sin decimales
   let PC_Formateado = parseFloat(PC).toLocaleString("es-ES");
   let PC2_Formateado = parseFloat(PC2).toLocaleString("es-ES");
 
@@ -100,6 +99,9 @@ function agregarFila(tablaBody, codigo, factura, fecha, PC, PC2, PC3, ref) {
         <td class="acciones-col">
             <button class="btn btn-warning btn-sm" onclick="editarRegistro(this)">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="eliminarRegistro(this)">Eliminar</button>
+        </td>
+        <td class="check-col" style="display: none;">
+            <input type="checkbox" class="fila-checkbox">
         </td>
     `;
   tablaBody.appendChild(nuevaFila);
@@ -463,4 +465,115 @@ function enviarPorWhatsApp() {
 function limpiarTabla() {
   document.getElementById("tabla-body").innerHTML = ""; // Vacía la tabla
   localStorage.removeItem("tablaDatos"); // Borra los datos guardados en el cache
+}
+
+let modoEliminar = false;
+let seleccionando = false;
+
+function toggleEliminarVarios() {
+  modoEliminar = !modoEliminar;
+
+  let checkCols = document.querySelectorAll(".check-col");
+  let checkboxes = document.querySelectorAll(".fila-checkbox");
+  let btnEliminarVarios = document.getElementById("btn-eliminar-varios");
+  let btnConfirmarEliminar = document.getElementById("btn-confirmar-eliminar");
+
+  if (modoEliminar) {
+    checkCols.forEach((col) => (col.style.display = "table-cell"));
+    checkboxes.forEach((checkbox) => (checkbox.style.display = "inline-block"));
+    btnEliminarVarios.style.display = "none";
+    btnConfirmarEliminar.style.display = "inline-block";
+    document.getElementById("cancelar-eliminar").style.display = "inline-block";
+  } else {
+    checkCols.forEach((col) => (col.style.display = "none"));
+    checkboxes.forEach((checkbox) => (checkbox.checked = false));
+    btnEliminarVarios.style.display = "inline-block";
+    btnConfirmarEliminar.style.display = "none";
+    document.getElementById("cancelar-eliminar").style.display = "none";
+  }
+}
+
+function eliminarSeleccionados() {
+  let checkboxes = document.querySelectorAll(".fila-checkbox:checked");
+
+  if (checkboxes.length === 0) {
+    mostrarModalNoSeleccion();
+    return;
+  }
+
+  mostrarModalConfirmarEliminar(() => {
+    checkboxes.forEach((checkbox) => {
+      let fila = checkbox.closest("tr");
+      fila.remove();
+    });
+
+    toggleEliminarVarios();
+  });
+}
+
+function mostrarModalNoSeleccion() {
+  const modal = document.getElementById("modal-no-seleccion");
+  const cerrarModal = document.getElementById("cerrar-modal-no-seleccion");
+
+  modal.style.display = "flex";
+
+  cerrarModal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+}
+
+function mostrarModalConfirmarEliminar(onConfirm) {
+  const modal = document.getElementById("modal-confirmar-eliminar");
+  const confirmarBtn = document.getElementById("confirmar-eliminar");
+  const cancelarBtn = document.getElementById("cancelar-eliminar-modal");
+
+  modal.style.display = "flex";
+
+  confirmarBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+    onConfirm();
+  });
+
+  cancelarBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+}
+
+document.addEventListener("click", function (event) {
+  let checkbox = event.target.closest(".fila-checkbox");
+  if (checkbox && modoEliminar) {
+    checkbox.checked = !checkbox.checked;
+  }
+});
+
+document.addEventListener("mousedown", function (event) {
+  if (event.target.classList.contains("fila-checkbox") && modoEliminar) {
+    seleccionando = true;
+    event.target.checked = !event.target.checked;
+  }
+});
+
+document.addEventListener("mousemove", function (event) {
+  if (seleccionando && modoEliminar) {
+    let checkbox = event.target.closest(".fila-checkbox");
+    if (checkbox) {
+      checkbox.checked = true;
+    }
+  }
+});
+
+document.addEventListener("mouseup", function () {
+  seleccionando = false;
+});
+
+function cancelarEliminacionMultiple() {
+  let checkboxes = document.querySelectorAll(".fila-checkbox");
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+
+  document.getElementById("cancelar-eliminar").style.display = "none";
+  document.getElementById("btn-confirmar-eliminar").style.display = "none";
+  document.getElementById("btn-eliminar-varios").style.display = "block";
+  toggleEliminarVarios();
 }
