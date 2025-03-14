@@ -55,7 +55,7 @@ function generarPDF2() {
     doc.text(`TRM: ${fila[1]}`, x + 25, y + 11); // Ajustado para no salirse del cuadro
     doc.text(`${fila[2]}`, x + 7, y + 15); // Ajustado para no salirse del cuadro
     doc.setTextColor(255, 0, 0);
-    doc.text(`| ${fila[5]}`, x + 30, y + 15); // Ajustado para no salirse del cuadro
+    doc.text(`| ${fila[5]}`, x + 26, y + 15); // Ajustado para no salirse del cuadro
     doc.setTextColor(0, 0, 0);
     doc.text(`REF: ${fila[6]}`, x + 7, y + 20); // Ajustado para no salirse del cuadro
 
