@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function actualizarPC2yPC3() {
-  let precioCompra = parseFloat(document.getElementById("PC").value.replace(/\./g, "")) || 0;
+  let precioCompra =
+    parseFloat(document.getElementById("PC").value.replace(/\./g, "")) || 0;
   let precioConIVA = precioCompra * 1.19;
   let precioRedondeado = redondearMiles(precioConIVA);
 
@@ -17,18 +18,25 @@ function actualizarPC2yPC3() {
 
   // Aplicar formato con separador de miles en PC y PC2
   document.getElementById("PC").value = precioCompra.toLocaleString("es-ES");
-  document.getElementById("PC2").value = parseFloat(precioConIVA.toFixed(0)).toLocaleString("es-ES");
+  document.getElementById("PC2").value = parseFloat(
+    precioConIVA.toFixed(0)
+  ).toLocaleString("es-ES");
 }
 
 function guardarRegistro() {
   let codigo = document.getElementById("codigo").value.trim();
   let factura = document.getElementById("factura").value.trim();
-  let fecha = document.getElementById("fecha").value.trim();
-  
-  // Eliminar separadores de miles antes de convertirlos en número
-  let PC = parseFloat(document.getElementById("PC").value.replace(/\./g, "")) || 0;
-  let PC2 = parseFloat(document.getElementById("PC2").value.replace(/\./g, "")) || 0;
-  
+  let fechaInput = document.getElementById("fecha").value.trim();
+
+  // Convertir la fecha a formato DD-MM-YYYY
+  let [año, mes, dia] = fechaInput.split("-");
+  let fecha = `${dia}-${mes}-${año}`;
+
+  let PC =
+    parseFloat(document.getElementById("PC").value.replace(/\./g, "")) || 0;
+  let PC2 =
+    parseFloat(document.getElementById("PC2").value.replace(/\./g, "")) || 0;
+
   let PC3 = document.getElementById("PC3").value;
   let ref = document.getElementById("ref").value;
   let cantidad = parseInt(document.getElementById("cantidad").value) || 1;
@@ -47,17 +55,15 @@ function guardarRegistro() {
 
   if (filaEditando) {
     if (cantidad === 1) {
-      // Si la cantidad es 1, actualizar la fila en su lugar
       let celdas = filaEditando.children;
       celdas[0].textContent = codigo;
       celdas[1].textContent = factura;
-      celdas[2].textContent = fecha;
+      celdas[2].textContent = fecha; // Ahora con el formato DD-MM-YYYY
       celdas[3].textContent = PC.toLocaleString("es-ES");
       celdas[4].textContent = PC2.toLocaleString("es-ES");
       celdas[5].textContent = PC3;
       celdas[6].textContent = ref;
     } else {
-      // Si la cantidad es mayor a 1, eliminar la fila original y agregar nuevas al final
       filaEditando.remove();
       for (let i = 0; i < cantidad; i++) {
         agregarFila(tablaBody, codigo, factura, fecha, PC, PC2, PC3, ref);
@@ -65,12 +71,10 @@ function guardarRegistro() {
     }
     filaEditando = null;
   } else {
-    // Si es un nuevo registro, agregar las filas normalmente
     for (let i = 0; i < cantidad; i++) {
       agregarFila(tablaBody, codigo, factura, fecha, PC, PC2, PC3, ref);
     }
   }
-
   guardarDatos();
   limpiarFormulario();
 
@@ -106,10 +110,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Evento de doble clic para editar (funciona en desktop y móvil)
   tablaBody.addEventListener("dblclick", function (event) {
-      const fila = event.target.closest("tr");
-      if (fila) {
-          editarRegistro(fila.querySelector(".btn-warning"));
-      }
+    const fila = event.target.closest("tr");
+    if (fila) {
+      editarRegistro(fila.querySelector(".btn-warning"));
+    }
   });
 
   // Evento de "hold" para eliminar (compatible con móviles)
@@ -117,48 +121,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Evento para dispositivos táctiles
   tablaBody.addEventListener("touchstart", function (event) {
-      const fila = event.target.closest("tr");
-      if (fila) {
-          holdTimer = setTimeout(() => {
-              mostrarModalEliminar(fila);
-          }, 1000); // 2 segundos
-      }
+    const fila = event.target.closest("tr");
+    if (fila) {
+      holdTimer = setTimeout(() => {
+        mostrarModalEliminar(fila);
+      }, 1000); // 2 segundos
+    }
   });
 
   tablaBody.addEventListener("touchend", function () {
-      clearTimeout(holdTimer);
+    clearTimeout(holdTimer);
   });
 
   tablaBody.addEventListener("touchcancel", function () {
-      clearTimeout(holdTimer);
+    clearTimeout(holdTimer);
   });
 
   // Evento para dispositivos con mouse
   tablaBody.addEventListener("mousedown", function (event) {
-      const fila = event.target.closest("tr");
-      if (fila) {
-          holdTimer = setTimeout(() => {
-              mostrarModalEliminar(fila);
-          }, 1000); // 2 segundos
-      }
+    const fila = event.target.closest("tr");
+    if (fila) {
+      holdTimer = setTimeout(() => {
+        mostrarModalEliminar(fila);
+      }, 1000); // 2 segundos
+    }
   });
 
   tablaBody.addEventListener("mouseup", function () {
-      clearTimeout(holdTimer);
+    clearTimeout(holdTimer);
   });
 
   tablaBody.addEventListener("mouseleave", function () {
-      clearTimeout(holdTimer);
+    clearTimeout(holdTimer);
   });
 });
 
 function mostrarModalEliminar(fila) {
-  const modalEliminar = new bootstrap.Modal(document.getElementById("modalEliminar"));
+  const modalEliminar = new bootstrap.Modal(
+    document.getElementById("modalEliminar")
+  );
   modalEliminar.show();
 
   document.getElementById("confirmarEliminar").onclick = function () {
-      fila.remove();
-      modalEliminar.hide();
+    fila.remove();
+    modalEliminar.hide();
   };
 }
 
@@ -171,8 +177,14 @@ function editarRegistro(boton) {
   document.getElementById("fecha").value = celdas[2].textContent;
 
   // ❌ Quitar separador de miles antes de asignar al input
-  document.getElementById("PC").value = celdas[3].textContent.replace(/\./g, "");
-  document.getElementById("PC2").value = celdas[4].textContent.replace(/\./g, "");
+  document.getElementById("PC").value = celdas[3].textContent.replace(
+    /\./g,
+    ""
+  );
+  document.getElementById("PC2").value = celdas[4].textContent.replace(
+    /\./g,
+    ""
+  );
   document.getElementById("PC3").value = celdas[5].textContent;
   document.getElementById("ref").value = celdas[6].textContent;
 
@@ -182,7 +194,6 @@ function editarRegistro(boton) {
   let modal = new bootstrap.Modal(document.getElementById("modal"));
   modal.show();
 }
-  
 
 function limpiarFormulario() {
   document.getElementById("modal-form").reset();
@@ -365,9 +376,9 @@ function recibirDatos() {
     .then((response) => response.json())
     .then((data) => {
       ocultarSpinner(); // Ocultar spinner después de recibir datos
-      
+
       let tablaBody = document.getElementById("tabla-body");
-      
+
       // Obtener datos almacenados previamente
       let datosGuardados = JSON.parse(localStorage.getItem("tablaDatos")) || [];
 
@@ -385,7 +396,7 @@ function recibirDatos() {
       console.error("Error:", error);
       mostrarError("No encontré nada, ¡pide que te envíen los datos!.");
     });
-} 
+}
 
 // Función para mostrar datos en la tabla
 function mostrarDatosEnTabla(datos) {
@@ -413,7 +424,6 @@ function mostrarDatosEnTabla(datos) {
     tablaBody.appendChild(nuevaFila); // Agregar la fila a la tabla
   });
 }
-
 
 let doc;
 
