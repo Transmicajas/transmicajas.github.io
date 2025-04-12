@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_blank">
+    <meta charset="utf-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Open Sans', sans-serif;
+            color: #333
+        }
+
+        .wrapper {
+            max-width: 600px;
+            margin: auto;
+            border: 2px solid #8F2421;
+            border-radius: 8px;
+            overflow: hidden
+        }
+
+        .header {
+            background: #8F2421;
+            padding: 25px 20px;
+            text-align: center
+        }
+
+        .logo-container {
+            background: white;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 4px
+        }
+
+        .logo {
+            max-width: 180px;
+            height: auto
+        }
+
+        .title {
+            color: white;
+            margin-top: 15px;
+            font-size: 22px;
+            font-weight: 600
+        }
+
+        .content {
+            padding: 25px;
+            background: white
+        }
+
+        .highlight {
+            color: #8F2421;
+            font-weight: 600
+        }
+
+        .description,
+        .greeting,
+        .closing-text {
+            font-size: 15px;
+            margin-bottom: 20px
+        }
+
+        .data-box {
+            background: #F8F5F5;
+            border: 1px solid #E8E8E8;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 25px;
+            max-width: 320px;
+            margin: auto
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #ccc;
+            padding: 8px 0;
+            font-size: 14px
+        }
+
+        .row:last-child {
+            border: none
+        }
+
+        .label {
+            font-weight: 600;
+            color: #555
+        }
+
+        .value {
+            font-weight: 700;
+            color: #8F2421
+        }
+
+        .validity {
+            background: #8F2421;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 30px 0
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            display: inline-block
+        }
+
+        .whatsapp {
+            background: #25D366
+        }
+
+        .web {
+            background: #3B424F
+        }
+
+        .footer {
+            background: #F9F9F9;
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            border-top: 1px solid #ddd
+        }
+
+        .footer a {
+            color: #8F2421;
+            text-decoration: none;
+            margin: 0 8px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://transmicajas.com/images/2_logo-default-168x40.png" class="logo"
+                    alt="Logo Transmicajas">
+            </div>
+            <h1 class="title">COTIZACIÓN #
+                <?= cuentaCorreo ?>
+            </h1>
+        </div>
+
+        <div class="content">
+            <p class="greeting">Estimado/a <span class="highlight">
+                    <?= empresaNombre ?>
+                </span>,</p>
+            <p class="description">Adjunto encontrará la cotización <strong>#
+                    <?= cuentaCorreo ?>
+                </strong> con los detalles solicitados.</p>
+
+            <div class="data-box">
+                <div class="row"><span class="label">FECHA</span><span class="value">
+                        <?= fechaCorreo ?>
+                    </span></div>
+                <div class="row"><span class="label">VALOR TOTAL</span><span class="value">
+                        <?= formatCurrency(totalConIva) ?>
+                    </span></div>
+                <div class="validity">Validez: 15 días</div>
+            </div>
+
+            <div class="buttons">
+                <a class="btn whatsapp"
+                    href="https://wa.me/573213997403?text=Hola%20Transmicajas,%20tengo%20una%20consulta%20sobre%20la%20cotización%20<?= cuentaCorreo ?>">WhatsApp</a>
+                <a class="btn web" href="https://transmicajas.com">Sitio Web</a>
+            </div>
+
+            <p class="closing-text">Estamos a su disposición para cualquier aclaración o modificación que necesite.</p>
+            <p class="signature" style="text-align:center;font-weight:600;color:#8F2421">¡Gracias por preferir a
+                TRANSMICAJAS!</p>
+        </div>
+
+        <div class="footer">
+            <div>
+                <a href="tel:+573213997403">321 399 7403</a> |
+                <a href="mailto:contacto@transmicajas.com">contacto@transmicajas.com</a>
+            </div>
+            <div>
+                <a href="https://transmicajas.com">transmicajas.com</a> |
+                <a href="https://www.instagram.com/transmicajas_1/">@transmicajas_1</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

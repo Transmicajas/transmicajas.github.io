@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Formulario de Acceso</title>
+<style>
+  #contenedor-oculto {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Formulario de Acceso</h1>
+
+<form id="formulario">
+  <label for="usuario">Usuario:</label><br>
+  <input type="text" id="usuario" name="usuario"><br>
+  <label for="contrasena">Contraseña:</label><br>
+  <input type="password" id="contrasena" name="contrasena"><br><br>
+  <button type="submit">Enviar</button>
+</form>
+
+<div id="contenedor-oculto">
+  <h2>¡Acceso concedido!</h2>
+  <p>Bienvenido al contenido exclusivo.</p>
+</div>
+
+<script>
+  const formulario = document.getElementById('formulario');
+  const contenedorOculto = document.getElementById('contenedor-oculto');
+
+  formulario.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const usuario = document.getElementById('usuario').value;
+    const contrasena = document.getElementById('contrasena').value;
+
+    // Llama a la API de GAS
+    fetch('https://script.google.com/macros/s/AKfycbx2LvuSDmX6_i58WAuRtVoiLeAJcc-NPjS1SeZd-Y8CfGUiDSg8YO--fFFaatCaCrQVAQ/exec?usuario=' + usuario + '&contrasena=' + contrasena) // Reemplaza con la URL de tu API
+      .then(response => response.json())
+      .then(data => {
+        if (data.result) { // Si la API devuelve true
+          formulario.style.display = 'none';
+          contenedorOculto.style.display = 'block';
+        } else {
+          alert('Usuario o contraseña incorrectos.');
+        }
+      })
+      .catch(error => {
+        console.error('Error al llamar a la API:', error);
+        alert('Ocurrió un error al validar tus datos.');
+      });
+  });
+</script>
+
+</body>
+</html>
