@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador Transmicajas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+
+<body>
+    <div class="fondo" id="fondo">
+        <div id="login" class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h2>Iniciar Sesión</h2>
+                    <p>Accede a tu cuenta para continuar</p>
+                </div>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Usuario</label>
+                        <div class="input-container">
+                            <span class="input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+                                </svg>
+                            </span>
+                            <input type="text" id="username" class="form-input" placeholder="Ingresa tu usuario"
+                                required>
+                            <span class="input-status"></span>
+                        </div>
+                        <div class="error-message" id="username-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-container">
+                            <span class="input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                                </svg>
+                            </span>
+                            <input type="password" id="password" class="form-input" placeholder="Ingresa tu contraseña"
+                                required>
+                            <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                    <path
+                                        d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="error-message" id="password-error"></div>
+                    </div>
+
+                    <!-- <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <span class="checkmark"></span>
+                            Recordar sesión
+                        </label>
+                        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                    </div> -->
+
+                    <button id="login-button" type="submit" class="login-button">
+                        <span class="button-text">Iniciar Sesión</span>
+                        <span class="button-loader">
+                            <svg viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                            </svg>
+                        </span>
+                    </button>
+
+                </form>
+
+                <div id="message" class="login-message"></div>
+            </div>
+        </div>
+
+        <!-- Spinner de carga -->
+        <div id="loadingSpinner" class="TextoSpinner" style="display: none;">
+            <div class="TextoSpinner-content">
+                <img src="images/loading.svg" alt="">
+                <p>Validando credenciales</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="contentFactOCC" style="display: none;">
+        <!-- ----------------------------------------PRIMERA HOJA ----------------------------------------->
+        <div id="contenido-facturas" class="active">
+
+            <div class="professional-header">
+                <div class="title-container">
+                    <h1 class="main-title">Generador Cotizaciones</h1>
+                    <p class="subtitle">Sistema de generación de cotizaciones en línea</p>
+                </div>
+                <div class="header-line"></div>
+                <div class="header-background"></div>
+
+            </div>
+            <div class="space-title"></div>
+            <button id="fullscreen-button" class="fullscreen-btn" title="Pantalla completa">
+                🔳
+            </button>
+
+
+            <!-- <div class="space-title"></div> -->
+            <!-- Botón para mostrar los demás botones (arriba) -->
+            <div class="circle-toggle-btn" id="circleToggleBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0" />
+                </svg>
+            </div>
+
+            <div class="circle-toggle-btn-b" id="borrarCotizacion">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-eraser-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293z" />
+                </svg>
+            </div>
+
+
+
+
+            <!-- Botón para "Agregar Dato" (debajo) -->
+            <div class="circle-action-btn-h1" id="addCotizacionBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-plus"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                </svg>
+            </div>
+
+            <!-- Botón para "PDF RAPIDO" (debajo) -->
+            <div class="circle-action-btn-pdfRapido" id="addPdfRapido">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                    class="bi bi-file-earmark-pdf-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M5.523 12.424q.21-.124.459-.238a8 8 0 0 1-.45.606c-.28.337-.498.516-.635.572l-.035.012a.3.3 0 0 1-.026-.044c-.056-.11-.054-.216.04-.36.106-.165.319-.354.647-.548m2.455-1.647q-.178.037-.356.078a21 21 0 0 0 .5-1.05 12 12 0 0 0 .51.858q-.326.048-.654.114m2.525.939a4 4 0 0 1-.435-.41q.344.007.612.054c.317.057.466.147.518.209a.1.1 0 0 1 .026.064.44.44 0 0 1-.06.2.3.3 0 0 1-.094.124.1.1 0 0 1-.069.015c-.09-.003-.258-.066-.498-.256M8.278 6.97c-.04.244-.108.524-.2.829a5 5 0 0 1-.089-.346c-.076-.353-.087-.63-.046-.822.038-.177.11-.248.196-.283a.5.5 0 0 1 .145-.04c.013.03.028.092.032.198q.008.183-.038.465z" />
+                    <path fill-rule="evenodd"
+                        d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2zM4.165 13.668c.09.18.23.343.438.419.207.075.412.04.58-.03.318-.13.635-.436.926-.786.333-.401.683-.927 1.021-1.51a11.7 11.7 0 0 1 1.997-.406c.3.383.61.713.91.95.28.22.603.403.934.417a.86.86 0 0 0 .51-.138c.155-.101.27-.247.354-.416.09-.181.145-.37.138-.563a.84.84 0 0 0-.2-.518c-.226-.27-.596-.4-.96-.465a5.8 5.8 0 0 0-1.335-.05 11 11 0 0 1-.98-1.686c.25-.66.437-1.284.52-1.794.036-.218.055-.426.048-.614a1.24 1.24 0 0 0-.127-.538.7.7 0 0 0-.477-.365c-.202-.043-.41 0-.601.077-.377.15-.576.47-.651.823-.073.34-.04.736.046 1.136.088.406.238.848.43 1.295a20 20 0 0 1-1.062 2.227 7.7 7.7 0 0 0-1.482.645c-.37.22-.699.48-.897.787-.21.326-.275.714-.08 1.103" />
+                </svg>
+            </div>
+
+
+
+
+
+            <!-- Contenedor de los botones -->
+            <div class="circle-btns-container" id="circleBtnsContainer">
+
+
+
+                <button class="circle-btn" id="enviar_correo"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                        height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                        <path
+                            d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
+                    </svg>
+                </button>
+
+                <button class="circle-btn" id="whatsapp-btn" onclick="enviarPorWhatsApp()"><svg
+                        xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                        class="bi bi-whatsapp" viewBox="0 0 16 16">
+                        <path
+                            d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
+                    </svg>
+                </button>
+                <button class="circle-btn " id="openModalPdfBtn"><svg xmlns="http://www.w3.org/2000/svg" width="26"
+                        height="26" fill="currentColor" class="bi bi-file-earmark-pdf-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M5.523 12.424q.21-.124.459-.238a8 8 0 0 1-.45.606c-.28.337-.498.516-.635.572l-.035.012a.3.3 0 0 1-.026-.044c-.056-.11-.054-.216.04-.36.106-.165.319-.354.647-.548m2.455-1.647q-.178.037-.356.078a21 21 0 0 0 .5-1.05 12 12 0 0 0 .51.858q-.326.048-.654.114m2.525.939a4 4 0 0 1-.435-.41q.344.007.612.054c.317.057.466.147.518.209a.1.1 0 0 1 .026.064.44.44 0 0 1-.06.2.3.3 0 0 1-.094.124.1.1 0 0 1-.069.015c-.09-.003-.258-.066-.498-.256M8.278 6.97c-.04.244-.108.524-.2.829a5 5 0 0 1-.089-.346c-.076-.353-.087-.63-.046-.822.038-.177.11-.248.196-.283a.5.5 0 0 1 .145-.04c.013.03.028.092.032.198q.008.183-.038.465z" />
+                        <path fill-rule="evenodd"
+                            d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m5.5 1.5v2a1 1 0 0 0 1 1h2zM4.165 13.668c.09.18.23.343.438.419.207.075.412.04.58-.03.318-.13.635-.436.926-.786.333-.401.683-.927 1.021-1.51a11.7 11.7 0 0 1 1.997-.406c.3.383.61.713.91.95.28.22.603.403.934.417a.86.86 0 0 0 .51-.138c.155-.101.27-.247.354-.416.09-.181.145-.37.138-.563a.84.84 0 0 0-.2-.518c-.226-.27-.596-.4-.96-.465a5.8 5.8 0 0 0-1.335-.05 11 11 0 0 1-.98-1.686c.25-.66.437-1.284.52-1.794.036-.218.055-.426.048-.614a1.24 1.24 0 0 0-.127-.538.7.7 0 0 0-.477-.365c-.202-.043-.41 0-.601.077-.377.15-.576.47-.651.823-.073.34-.04.736.046 1.136.088.406.238.848.43 1.295a20 20 0 0 1-1.062 2.227 7.7 7.7 0 0 0-1.482.645c-.37.22-.699.48-.897.787-.21.326-.275.714-.08 1.103" />
+                    </svg></button>
+
+
+
+            </div>
+
+            <!-- Modal -->
+            <div id="emailModal" class="modal">
+                <div class="modal-content-whatsap">
+                    <div class="modal-header">Enviar Correo</div>
+                    <label for="emailInput">Correo destinatario:</label>
+                    <input type="email" id="emailInput" placeholder="Ingresa tu correo">
+
+                    <label for="modalFechacorreo">Fecha:</label>
+                    <input type="date" class="modalFecha" id="modalFechacorreo" required><br><br>
+
+                    <label for="modalCuentacorreo">Número de Factura:</label>
+                    <input type="text" id="modalCuentacorreo" placeholder="Ejemplo: 123456789" required><br><br>
+
+                    <div class="modal-footer">
+                        <button id="closeModalEmail">Cerrar</button>
+                        <button id="sendEmailButton">Enviar por correo</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Modal personalizado enviar por whatsap -->
+            <div id="pdfWhatsappModal" class="modal">
+                <div class="modal-content-whatsap">
+                    <h3>No se encontró el PDF. <br> ¿Deseas generarlo?</h3>
+                    <p>Datos para la Cuenta de Cobro</p>
+                    <label for="modalFecha">Fecha:</label>
+                    <input type="date" class="modalFecha" id="modalFechaw" required><br><br>
+
+                    <label for="modalCuenta">Número de Factura:</label>
+                    <input type="text" id="modalCuentaw" value="1" placeholder="" required><br><br>
+
+                    <label for="nombreCliente">Nombre del Cliente (opcional):</label>
+                    <input type="text" id="nombreClientew" placeholder="Nombre completo"><br><br>
+
+                    <label for="cedulaCliente">Numero Celular:</label>
+                    <input type="text" id="cedulaClientew" placeholder="Celular: "><br><br>
+
+                    <button id="generatePdfWhatsappBtn">Generar PDF</button>
+                    <span class="closeW close-btn">&times;</span>
+                </div>
+            </div>
+
+            <!-- Modal para seleccionar a quién enviar el PDF -->
+            <div id="whatsappSelectionModal" class="modal">
+                <div class="modal-content-whatsap">
+                    <h3>¿A quién deseas enviarlo?</h3>
+                    <button id="sendToMe">Para mí</button>
+                    <br><br>
+                    <label for="clientNumber">Número del Cliente:</label>
+                    <input type="text" id="clientNumber" placeholder="Ejemplo: 3001234567">
+                    <button id="sendToClient">Enviar al Cliente</button>
+                    <br><br>
+                    <span class="closeW2">&times;</span>
+                </div>
+            </div>
+
+            <!-- Modal Correo Pedir datos -->
+            <div id="empresaModal" class="modal">
+                <div class="modal-content-whatsap">
+                    <h3>Escribe los datos de la Empresa/Cliente</h3>
+                    <p>Datos del nuevo cliente</p>
+                    <label>Nombre: <input type="text" id="nombreEmpresaInput"></label><br>
+                    <label>NIT: <input type="text" id="nitEmpresaInput"></label><br>
+                    <label>Ubicación: <input type="text" id="ubicacionEmpresaInput"></label><br>
+                    <label>Teléfono: <input type="text" id="telefonoEmpresaInput"></label><br>
+                    <label>Dirección: <input type="text" id="direccionEmpresaInput"></label><br>
+                    <button id="saveEmpresaButton">Guardar</button>
+                    <span class="closeW3">&times;</span>
+                </div>
+            </div>
+
+
+            <!-- Modal para pedir Fecha y Número de Cuenta -->
+
+            <div class="modal" id="pdfModal">
+                <div class="modal-content-whatsap">
+                    <h3>Datos para la Cuenta de Cobro</h3>
+                    <label for="modalFecha">Fecha:</label>
+                    <input type="date" class="modalFecha" id="modalFecha" required><br><br>
+
+                    <label for="modalCuenta">Número de factura:</label>
+                    <input type="text" id="modalCuenta" value="1" placeholder="" required>
+
+
+                    <label for="nombreCliente">Nombre del Cliente (opcional):</label>
+                    <input type="text" id="nombreCliente" placeholder="Nombre completo"><br><br>
+
+                    <label for="cedulaCliente">Cedula/NIT (opcional):</label>
+                    <input type="text" id="cedulaCliente" placeholder="Cedula / NIT"><br><br>
+                    <label for="direccionCliente">Direccion(opcional):</label>
+                    <input type="text" id="direccionCliente" placeholder="Direccion / Ubicacion"><br><br>
+
+                    <label for="clularCliente">Celular(opcional) :</label>
+                    <input type="text" id="celularCliente" placeholder="Celular"><br><br>
+
+                    <div class="buttons-pdf">
+                        <button class="btn-cancelar-what" id="closeModalPdfBtn">Cancelar</button>
+                        <button id="generatePdfBtn">Generar PDF</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Modal -->
+            <div id="cotizacionModal" class="cotizacion-modal">
+                <div class="cotizacion-modal-content">
+                    <div class="cotizacion-header">
+                        <div class="header-content">
+                            <i class="fas fa-file-invoice-dollar header-icon"></i>
+                            <h2>Agregar Cotización</h2>
+                        </div>
+                        <span class="cotizacion-close-btn" id="closeModal">&times;</span>
+                    </div>
+
+                    <div class="cotizacion-body">
+                        <!-- Barra de búsqueda -->
+                        <div class="cotizacion-search">
+                            <div class="search-container">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="searchInput" placeholder="Buscar producto..." autofocus>
+                            </div>
+                        </div>
+
+                        <div class="product-list-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Selecciona un producto:</h3>
+                                <span class="item-count" id="itemCount">+ items</span>
+                            </div>
+                            <div class="cotizacion-table-container">
+                                <table class="cotizacion-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="product-col">Producto</th>
+                                            <th class="text-right">P. Compra</th>
+                                            <th class="text-right">P. Venta</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productTable">
+                                        <tr class="empty-state">
+                                            <td colspan="5">
+                                                <i class="fas fa-box-open"></i>
+                                                <p>No hay productos agregados</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sección compacta en 2 filas -->
+                        <div class="two-row-product-info">
+                            <!-- Primera fila -->
+                            <div class="product-info-row">
+                                <div class="compact-pair">
+                                    <div class="compact-input-group">
+                                        <label>Producto</label>
+                                        <input type="text" id="nombreProducto" placeholder="-">
+                                    </div>
+                                    <div class="compact-input-group">
+                                        <label>Referencia</label>
+                                        <input type="text" id="refProducto" placeholder="-">
+                                    </div>
+                                </div>
+
+                                <div class="compact-pair">
+                                    <div class="compact-input-group">
+                                        <label>Marca</label>
+                                        <input type="text" id="productoMarca" placeholder="-">
+                                    </div>
+                                    <div class="compact-input-group">
+                                        <label>P. Compra</label>
+                                        <div class="input-with-icon">
+                                            <span class="currency">$</span>
+                                            <input type="text" id="precioCompra" placeholder="0.00" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Segunda fila -->
+                            <div class="product-info-row">
+                                <div class="compact-pair">
+                                    <div class="compact-input-group">
+                                        <label>P. Venta</label>
+                                        <div class="input-with-icon">
+                                            <span class="currency">$</span>
+                                            <input type="text" id="precioVenta" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="compact-input-group">
+                                        <label>Cantidad</label>
+                                        <div class="quantity-control compact">
+                                            <button class="quantity-btn minus">-</button>
+                                            <input type="number" id="cantidadProducto" min="1" value="1">
+                                            <button class="quantity-btn plus">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="action-buttons">
+                            <button class="cotizacion-add-btn" id="addProduct">
+                                <i class="fas fa-plus-circle"></i> Agregar Producto
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                /*  document.addEventListener('keydown', function (event) {
+                      if (event.code === 'Space') {
+                          event.preventDefault();
+                          const boton = document.getElementById('addCotizacionBtn');
+                          if (boton) {
+                              boton.click(); // Simula el clic
+                              // Esperamos un momento para que el modal termine de abrirse
+                              setTimeout(() => {
+                                  const input = document.getElementById('searchInput');
+                                  if (input) input.focus();
+                              }, 200); // Ajusta este tiempo si hay animaciones
+                          }
+                      }
+                  });*/
+
+                // También aplica el focus cuando se abre manualmente con el botón
+                document.getElementById('addCotizacionBtn').addEventListener('click', () => {
+                    setTimeout(() => {
+                        const input = document.getElementById('searchInput');
+                        if (input) input.focus();
+                    }, 200);
+                });
+            </script>
+
+
+            <!-- Tabla de productos seleccionados -->
+            <div class="centrar-contenido ">
+                <div class="productos-seleccionados-container">
+                    <div class="cotizacion-table-scroll">
+                        <table class="productos-seleccionados-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th>Producto</th>
+                                    <th class="text-right">PC</th>
+                                    <th class="text-right">PV</th>
+                                    <th class="text-center">Cant</th>
+                                    <th class="text-right">Subtotal</th>
+                                    <th class="text-center acciones-columna">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="selectedProducts"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-right"><strong>TOTAL:$</strong></td>
+                                    <td id="totalCotizacion" class="text-right total-amount">0.00</td>
+                                    <td class="acciones-columna"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const cantidadInput = document.getElementById('cantidadProducto');
+                    const minusBtn = document.querySelector('.quantity-btn.minus');
+                    const plusBtn = document.querySelector('.quantity-btn.plus');
+
+                    // Función para actualizar cantidad
+                    function updateQuantity(change) {
+                        let currentValue = parseInt(cantidadInput.value) || 1;
+                        let newValue = currentValue + change;
+
+                        // Asegurarse que no sea menor que el mínimo (1)
+                        newValue = Math.max(1, newValue);
+
+                        cantidadInput.value = newValue;
+
+                        // Actualizar estado de los botones
+                        minusBtn.disabled = newValue <= 1;
+
+                        // Disparar evento change
+                        const event = new Event('change', { bubbles: true });
+                        cantidadInput.dispatchEvent(event);
+                    }
+
+                    // Eventos para botones
+                    function setupButton(button, change) {
+                        button.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            updateQuantity(change);
+                        });
+
+                        // Efecto de click
+                        button.addEventListener('mousedown', function () {
+                            this.classList.add('active');
+                        });
+
+                        button.addEventListener('mouseup', function () {
+                            this.classList.remove('active');
+                        });
+
+                        button.addEventListener('mouseleave', function () {
+                            this.classList.remove('active');
+                        });
+                    }
+
+                    setupButton(minusBtn, -1);
+                    setupButton(plusBtn, 1);
+
+                    // Validar entrada manual
+                    cantidadInput.addEventListener('change', function () {
+                        let value = parseInt(this.value) || 1;
+                        this.value = Math.max(1, value);
+                        minusBtn.disabled = this.value <= 1;
+                    });
+
+                    // Inicializar estado del botón -
+                    minusBtn.disabled = cantidadInput.value <= 1;
+                });
+
+
+            </script>
+
+            <script src="js/agCotizacion.js"></script>
+            <script src="js/pdfSimple.js"></script>
+        </div>
+
+
+
+        <!-- ----------------------------------------SEGUNDA HOJA --------------------------------------- -->
+        <div id="contenido-clientes">
+            <div class="professional-header">
+
+                <div class="title-container">
+                    <h1 class="main-title">Inventario Transmicajas</h1>
+                    <p class="subtitle">Gestión de stock y existencias</p>
+                </div>
+                <div class="header-line"></div>
+            </div>
+            <div class="space-title"></div>
+            <!-- <iframe id="pdfPreview" src="about:blank"></iframe> -->
+
+            <div class="circle-toggle-btn" id="circleToggleBtn2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0" />
+                </svg>
+            </div>
+
+            <div class="circle-btns-container" id="circleBtnsContainer2">
+
+                <button class="circle-btn" id="clearCacheBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                        height="16" fill="currentColor" class="bi bi-eraser-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293z" />
+                    </svg>
+                </button>
+
+                <button class="circle-btn" id="descargarExcel"><svg xmlns="http://www.w3.org/2000/svg" width="26"
+                        height="26" fill="currentColor" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
+                        <path
+                            d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z" />
+                        <path
+                            d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+                    </svg></button>
+            </div>
+
+            <div class="container mt-4">
+                <!-- Botón para "Agregar Dato" (debajo) -->
+                <div class="circle-action-btn" id="addDataBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor"
+                        class="bi bi-plus" viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+                </div>
+
+
+
+
+
+                <div id="statusIndicator" class="status-indicator"
+                    style="position: fixed; top: 25px; left: 25px; display: none;">
+                    <span id="spinner" class="spinner" role="status" aria-hidden="true"></span>
+                    <span id="checkmark" class="checkmark">✔️</span>
+                </div>
+
+                <div class="center">
+                    <div class="table-container">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fecha</th>
+                                    <th>Ref</th>
+                                    <th>Cant</th>
+                                    <th>Nombre</th>
+                                    <th>PC</th>
+                                    <th>PV</th>
+                                    <th>Marca</th>
+                                    <th>Estado</th>
+                                    <th class="hide-on-small">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="tableBody">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="filter-toggle-btn" id="filterToggleBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+                    <path
+                        d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+                </svg></div>
+
+            <div class="filter-container" id="filterContainer">
+                <div>
+                    <label for="filterFecha" class="form-label">Filtrar por Fecha:</label>
+                    <input type="date" id="filterFecha" class="input-custom">
+                </div>
+                <div>
+                    <label for="filterPlaca" class="form-label">Filtrar por Referencia:</label>
+                    <input type="text" id="filterPlaca" class="input-custom">
+                </div>
+                <div class="filter-group">
+                    <label for="filterDescripcion">NombreProducto:</label>
+                    <input type="text" id="filterDescripcion" class="input-custom" placeholder="Buscar por nombre">
+                </div>
+                <div>
+                    <label for="filterEstado" class="form-label">Filtrar por Estado:</label>
+                    <select id="filterEstado" class="select-custom">
+                        <option value="">Seleccionar Estado</option>
+                        <option value="inventario">En Inventario</option>
+                        <option value="revisar">Por Revisar</option>
+                        <option value="agotado">agotado</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filterEmpresa" class="form-label">Filtrar por Marca:</label>
+                    <select id="filterEmpresa" class="select-custom">
+                        <option value="">-- Todas las marcas --</option>
+                        <option value="Fuller">Fuller</option>
+                        <option value="Euro">Euro</option>
+                        <option value="Meritor">Meritor</option>
+                        <option value="Gajra">Gajra</option>
+                        <option value="Bower">Bower</option>
+                        <option value="Tkl">Tkl</option>
+                        <option value="Ktc">Ktc</option>
+                        <option value="CR">CR</option>
+                        <option value="Cummins">Cummins</option>
+                        <option value="Bendix">Bendix</option>
+                        <option value="Ntn">Ntn</option>
+                        <option value="Koyo">Koyo</option>
+                        <option value="Sampa">Sampa</option>
+                        <option value="Mansons">Mansons</option>
+                        <option value="Dafra">Dafra</option>
+                        <option value="Bagen">Bagen</option>
+                        <option value="Tinken">Tinken</option>
+                        <option value="Nal">Nal</option>
+                        <option value="Spicer">Spicer</option>
+                        <option value="Víctor reinz">Víctor reinz</option>
+                        <option value="Loctite">Loctite</option>
+                        <option value="Wabco">Wabco</option>
+                        <option value="TAS">TAS</option>
+                        <option value="PAI">PAI</option>
+                        <option value="Sna">Sna</option>
+                        <option value="Fersa">Fersa</option>
+                        <option value="Hemdrickson">Hemdrickson</option>
+                        <option value="Imal">Imal</option>
+                        <option value="Firestone">Firestone</option>
+                        <option value="VDC">VDC</option>
+                        <option value="SKF">SKF</option>
+                        <option value="PARCRAF">PARCRAF</option>
+                        <option value="TRASTEC">TRASTEC</option>
+
+
+                    </select>
+                </div>
+                <button class="btn-custom" id="btnSinFiltro">Sin Filtro</button>
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Modal de Datos -->
+        <div class="modal-overlay" id="modalOverlay" style="display: none;">
+            <div class="modalDT">
+                <div class="modal-header">
+                    <h5 class="modal-title">AGREGAR PRODUCTO AL INVENTARIO</h5>
+                    <button class="btn-close" id="closeModalButton">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="two-column-grid">
+                        <div class="form-group">
+                            <label for="filterFecha" class="form-label">Filtrar por Fecha:</label>
+                            <input type="date" class="form-control compact-input" id="inputFecha"
+                                onfocus="this.valueAsDate = new Date()" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPlaca">Referencia</label>
+                            <input type="text" id="inputPlaca" class="form-control compact-input input-mayusculas"
+                                placeholder="EJ: REF-001" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputDescripcion">Nombre del Producto</label>
+                        <input type="text" id="inputDescripcion" class="form-control compact-input input-sin-comas"
+                            placeholder="Ej: Petuche" required>
+                    </div>
+
+                    <div class="three-column-grid">
+                        <div class="form-group">
+                            <label for="inputCantidad">Cantidad</label>
+                            <input type="number" id="inputCantidad" class="form-control compact-input" placeholder="0"
+                                min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPrecio">P.Compra</label>
+                            <input type="number" id="inputPrecio" class="form-control compact-input" placeholder="$"
+                                min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPrecioVenta">P.Venta</label>
+                            <input type="number" id="inputPrecioVenta" class="form-control compact-input"
+                                placeholder="$" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="two-column-grid">
+                        <div class="form-group">
+                            <label for="inputEstado">Estado</label>
+                            <select id="inputEstado" class="form-control compact-input">
+                                <option value="inventario">En Inventario</option>
+                                <option value="revisar">Por Revisar</option>
+                                <option value="agotado">Agotado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmpresa">Marca</label>
+                            <select id="inputEmpresa" class="form-control compact-input">
+                                <option value="Sin Marca">Seleccione marca</option>
+                                <option value="Fuller">Fuller</option>
+                                <option value="Euro">Euro</option>
+                                <option value="Meritor">Meritor</option>
+                                <option value="Gajra">Gajra</option>
+                                <option value="Bower">Bower</option>
+                                <option value="Tkl">Tkl</option>
+                                <option value="Ktc">Ktc</option>
+                                <option value="CR">CR</option>
+                                <option value="Cummins">Cummins</option>
+                                <option value="Bendix">Bendix</option>
+                                <option value="Ntn">Ntn</option>
+                                <option value="Koyo">Koyo</option>
+                                <option value="Sampa">Sampa</option>
+                                <option value="Mansons">Mansons</option>
+                                <option value="Dafra">Dafra</option>
+                                <option value="Bagen">Bagen</option>
+                                <option value="Tinken">Tinken</option>
+                                <option value="Nal">Nal</option>
+                                <option value="Spicer">Spicer</option>
+                                <option value="Víctor reinz">Víctor reinz</option>
+                                <option value="Loctite">Loctite</option>
+                                <option value="Wabco">Wabco</option>
+                                <option value="TAS">TAS</option>
+                                <option value="PAI">PAI</option>
+                                <option value="Sna">Sna</option>
+                                <option value="Fersa">Fersa</option>
+                                <option value="Hemdrickson">Hemdrickson</option>
+                                <option value="Imal">Imal</option>
+                                <option value="Firestone">Firestone</option>
+                                <option value="VDC">VDC</option>
+                                <option value="SKF">SKF</option>
+                                <option value="PARCRAF">PARCRAF</option>
+                                <option value="TRASTEC">TRASTEC</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelButton">Cancelar</button>
+                    <button class="btn btn-primary" id="saveData">Guardar Producto</button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Modal de Confirmación de Eliminación -->
+        <div class="modal-overlay modal-custom" id="confirmModal" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmación</h5>
+                        <button type="button" class="close-btn" data-close-modal>×</button>
+                    </div>
+                    <div>
+                        ¿Estás seguro de que deseas eliminar esta fila?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-custom" data-close-modal>Cancelar</button>
+                        <button type="button" id="confirmDelete" class="btn-custom danger">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal de Error -->
+        <div class="modal-custom" id="errorModal" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                        <button type="button" class="close-btn" data-close-modal>×</button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="errorMessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-custom" data-close-modal>Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ------------------------------------------tercera hoja --------------------------------------- -->
+
+        <div id="contenido-empresas" class="bodyRegistro">
+            <div class="professional-header">
+
+                <div class="title-container">
+                    <h1 class="main-title">Clientes</h1>
+                    <p class="subtitle">Registro y control de cotizaciones</p>
+                </div>
+                <div class="header-line"></div>
+            </div>
+            <div class="space-title"></div>
+
+            <div id="contenedorCotizaciones">
+                <div class="carga">
+                    <div class="carga-futurista">
+                        <div class="holograma"></div>
+                        <div class="puntos-carga">
+                            <div class="punto"></div>
+                            <div class="punto"></div>
+                            <div class="punto"></div>
+                        </div>
+                        <p class="texto-carga">Cargando registros...</p>
+                    </div>
+                </div>
+            </div>
+            <div id="modal-eliminar" class="modal-futurista">
+                <div class="modal-contenido">
+                    <div class="holograma-modal"></div>
+                    <h3>Confirmar eliminación</h3>
+                    <p id="modal-mensaje">¿Eliminar cotización de <span class="nombre-cliente"></span>?</p>
+                    <div class="modal-botones">
+                        <button class="boton-cancelar">Cancelar</button>
+                        <button class="boton-confirmar">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const API_BASE_URL = "https://script.google.com/macros/s/AKfycbz14jtQ97kiKBiEW0tIeIczMLaEjIpIKoBYJKTy5ITNJ95LWCJDdS0YAUJO3pVAC92LLQ/exec";
+
+                // Mostrar mensaje
+                function mostrarMensaje(mensaje, tipo = 'info') {
+                    const contenedor = document.getElementById("contenedorCotizaciones");
+                    let color;
+                    if (tipo === 'error') color = '#ff3a6d';
+                    else if (tipo === 'success') color = '#2dff9b';
+                    else color = '#00f0ff'; // info
+
+                    contenedor.innerHTML = `
+        <div class="mensaje-futurista" style="--color: ${color}">
+            <div class="holograma-pequeno"></div>
+            <p>${mensaje}</p>   
+        </div>
+    `;
+                }
+
+                async function eliminarCotizacion(id, nombreCliente, elemento) {
+                    if (!elemento) return;
+
+                    // Mostrar modal en lugar de confirm
+                    const modal = document.getElementById('modal-eliminar');
+                    const modalMensaje = document.getElementById('modal-mensaje');
+                    const nombreClienteSpan = document.querySelector('.nombre-cliente');
+
+                    nombreClienteSpan.textContent = nombreCliente;
+                    modal.style.display = 'flex';
+
+                    // Esperar a que el usuario tome una decisión
+                    const confirmacion = await new Promise((resolve) => {
+                        document.querySelector('.boton-confirmar').onclick = () => {
+                            modal.style.display = 'none';
+                            resolve(true);
+                        };
+
+                        document.querySelector('.boton-cancelar').onclick = () => {
+                            modal.style.display = 'none';
+                            resolve(false);
+                        };
+                    });
+
+                    if (!confirmacion) return;
+
+                    try {
+                        const botonEliminar = elemento.querySelector('.boton-eliminar');
+                        if (!botonEliminar) return;
+
+                        botonEliminar.innerHTML = '<div class="carga-eliminar"></div>Eliminando...';
+                        botonEliminar.disabled = true;
+
+                        const response = await fetch(API_BASE_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `id=${id}&action=delete`
+                        });
+
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                        const result = await response.text();
+
+                        if (result.trim() === "deleted") {
+                            elemento.style.transition = "all 0.5s ease";
+                            elemento.style.opacity = "0";
+                            setTimeout(() => elemento.remove(), 500);
+                        } else {
+                            throw new Error(result || "Error desconocido");
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                        const botonEliminar = elemento?.querySelector('.boton-eliminar');
+                        if (botonEliminar) {
+                            botonEliminar.innerHTML = 'Eliminar';
+                            botonEliminar.disabled = false;
+                        }
+                        mostrarMensaje(`Error al eliminar "${nombreCliente}": ${error.message}`, 'error');
+                    }
+                }
+
+                // Formatear fecha
+                function formatearFecha(fechaStr) {
+                    const fecha = new Date(fechaStr);
+                    return fecha.toLocaleDateString('es-ES').replace(/\//g, '-');
+                }
+
+                function crearTarjetaCotizacion(item) {
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'tarjeta';
+                    tarjeta.dataset.id = item.id;
+
+                    tarjeta.innerHTML = `
+        <div class="contenido-tarjeta">
+            <div class="cabecera-tarjeta">
+                <span class="fecha">${formatearFecha(item.fecha)}</span>
+                <span class="id">ID: ${item.id.split('-')[0]}</span>
+            </div>
+            <div class="cuerpo-tarjeta">
+                <h3>${item.nombreCliente}</h3>
+                <div class="grupo-datos">
+                    <div class="dato">
+                        <span class="dato-etiqueta">Cel:</span>
+                        <span class="dato-valor">${item.celularCliente}</span>
+                    </div>
+                    <div class="dato">
+                        <span class="dato-etiqueta">Cedula/Nit:</span>
+                        <span class="dato-valor">${item.cedulaCliente}</span>
+                    </div>
+                    <div class="dato">
+                        <span class="dato-etiqueta">direccion:</span>
+                        <span class="dato-valor">${item.direccionCliente}</span>
+                    </div>
+                    <div class="dato">
+                        <span class="dato-etiqueta">esta es la cotizacion #:</span>
+                        <span class="dato-valor">${item.cuenta}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="acciones">
+                <a href="${item.linkPdf}" target="_blank" class="boton-pdf">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.523 10.424q.21-.124.459-.124a.9.9 0 0 1 .63.252.9.9 0 0 1 .126 1.17l-2.714 3.466a.9.9 0 0 1-1.166.125.9.9 0 0 1-.252-.631q0-.25.124-.459zm3.974 2.033a.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9h-1.1v2.8h1.1z"/>
+                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                    </svg>
+                    Ver Cotizacion
+                </a>
+                <button class="boton-eliminar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                    </svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    `;
+
+                    tarjeta.querySelector('.boton-eliminar').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        eliminarCotizacion(item.id, item.nombreCliente, tarjeta);
+                    });
+
+                    return tarjeta;
+                }
+
+                // Cargar cotizaciones
+                async function cargarCotizaciones() {
+
+                    try {
+                        const response = await fetch(API_BASE_URL);
+
+                        if (!response.ok) throw new Error("Error al cargar");
+
+                        const data = await response.json();
+                        const contenedor = document.getElementById("contenedorCotizaciones");
+
+                        if (!data || data.length === 0) {
+                            mostrarMensaje("No hay registros", 'info');
+                            return;
+                        }
+
+                        contenedor.innerHTML = '';
+                        data.forEach(item => {
+                            contenedor.appendChild(crearTarjetaCotizacion(item));
+                        });
+
+
+
+                    } catch (error) {
+                        console.error("Error:", error);
+                        mostrarMensaje("Error al conectar con el servidor", 'error');
+                    }
+                }
+
+                // Iniciar
+                document.addEventListener('DOMContentLoaded', cargarCotizaciones);
+            </script>
+        </div>
+
+        <div class="footer">
+            <a href="#" id="facturas-btn" class="footer-link active">
+                <div class="icon-container">
+                    <img src="images/fact.png" alt="facturas">
+                </div>
+                <span>Cotizador</span>
+            </a>
+            <a href="#" id="clientes-btn" class="footer-link">
+                <div class="icon-container">
+                    <img src="images/empresa.png" alt="Bodega">
+                </div>
+                <span>Bodega</span>
+            </a>
+            <a href="#" id="empresas-btn" class="footer-link">
+                <div class="icon-container">
+                    <img src="images/client.png" alt="clientes">
+                </div>
+                <span>Clientes</span>
+            </a>
+        </div>
+
+
+    </div>
+
+    <script>
+
+        /*----------------------------------------LOGIN---------------------------------------*/
+        const formulario = document.getElementById('loginForm');
+        const contenedorForm = document.getElementById('login');
+        const contenedorFondo = document.getElementById('fondo');
+        const contenedorOculto = document.getElementById('contentFactOCC');
+        const mensaje = document.getElementById('message');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        formulario.addEventListener('submit', function (event) {
+            event.preventDefault();
+            mensaje.textContent = ""; // Limpiar mensaje de error
+
+            // Capturar credenciales
+            const usuario = document.getElementById('username').value;
+            const contrasena = document.getElementById('password').value;
+
+            // Ocultar formulario y mostrar spinner
+            contenedorForm.style.display = 'none';
+            loadingSpinner.style.display = 'flex';
+
+            fetch(`https://script.google.com/macros/s/AKfycbysrXErdEnLVDec8q92tNml_eH0o_e0IA768tt_3Nkq6m0q_4kEvTKbXWY6IwkiitR9/exec?usuario=${usuario}&contrasena=${contrasena}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result) {
+                        // Si las credenciales son correctas
+                        contenedorFondo.style.display = 'none';
+                        contenedorOculto.style.display = 'block';
+                    } else {
+                        // Si las credenciales son incorrectas, restaurar el formulario con mensaje de error
+                        mensaje.textContent = "Usuario o contraseña incorrectos.";
+                        mensaje.classList.add("text-danger");
+                        contenedorForm.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al llamar a la API:', error);
+                    alert('Ocurrió un error al validar tus datos.');
+                    contenedorForm.style.display = 'block'; // Restaurar el formulario en caso de error
+                })
+                .finally(() => {
+                    loadingSpinner.style.display = 'none'; // Ocultar el spinner después de la respuesta
+                });
+        });
+
+        /*INPUTS AGREGAR DATOS*/
+        document.querySelectorAll(".input-mayusculas").forEach(input => {
+            input.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+
+        document.querySelectorAll(".input-sin-comas").forEach(input => {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/,/g, ";"); // Reemplaza comas por guion
+            });
+        });
+        /*INPUTS AGREGAR DATOS END*/
+
+
+        // Obtener la fecha actual en formato YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
+
+        // Seleccionar todos los inputs con la clase "modalFechaw" y asignarles la fecha actual
+        document.querySelectorAll(".modalFecha").forEach(input => {
+            input.value = today; // Asignar la fecha actual
+        });
+
+
+
+        document.getElementById("clearCacheBtn").addEventListener("click", function () {
+            if (caches) {
+                // Abre todos los cachés almacenados y los elimina
+                caches.keys().then(function (names) {
+                    names.forEach(function (name) {
+                        caches.delete(name);
+                    });
+                });
+            }
+
+            // Borra el almacenamiento local y de sesión
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Recarga la página forzando la actualización de recursos
+            location.reload(true);
+        });
+
+
+        //BOTONES//
+        // Mostrar u ocultar los botones al hacer clic en el círculo superior
+        document.getElementById('circleToggleBtn').addEventListener('click', function (event) {
+            event.stopPropagation(); // Evitar que el clic se propague y cierre el contenedor inmediatamente
+            document.getElementById('circleBtnsContainer').classList.toggle('active');
+        });
+
+        // Cerrar el contenedor de botones si se hace clic fuera de él
+        document.addEventListener('click', function (event) {
+            var container = document.getElementById('circleBtnsContainer');
+            var toggleButton = document.getElementById('circleToggleBtn');
+
+
+            // Verificar si el clic fue fuera del contenedor de botones y los botones
+            if (!container.contains(event.target) && !toggleButton.contains(event.target)) {
+                container.classList.remove('active');
+            }
+        });
+
+        document.getElementById('circleToggleBtn2').addEventListener('click', function (event) {
+            event.stopPropagation(); // Evitar que el clic se propague y cierre el contenedor inmediatamente
+            document.getElementById('circleBtnsContainer2').classList.toggle('active');
+        });
+
+        // Cerrar el contenedor de botones si se hace clic fuera de él
+        document.addEventListener('click', function (event) {
+            var container = document.getElementById('circleBtnsContainer2');
+            var toggleButton = document.getElementById('circleToggleBtn2');
+
+
+            // Verificar si el clic fue fuera del contenedor de botones y los botones
+            if (!container.contains(event.target) && !toggleButton.contains(event.target)) {
+                container.classList.remove('active');
+            }
+        });
+
+
+
+
+
+        // Obtener referencias de los modales y botones
+        const errorModal = document.getElementById('errorModal');
+        const dataModal = document.getElementById('modalOverlay');
+        const confirmModal = document.getElementById('confirmModal');
+
+        // Botones de abrir/cerrar
+        const openDataModalButton = document.getElementById('addDataBtn');
+        const closeModalButtons = document.querySelectorAll('[data-close-modal], #closeModalButton, #cancelButton');
+        const saveDataButton = document.getElementById('saveData');
+        const clearCacheButton = document.getElementById('clearCacheBtn');
+        const confirmDeleteButton = document.getElementById('confirmDelete');
+
+        // Función genérica para abrir un modal
+        function openModal(modal) {
+            modal.style.display = 'flex';
+        }
+
+        // Función genérica para cerrar un modal
+        function closeModal(modal) {
+            modal.style.display = 'none';
+        }
+
+        // Modal de Error
+        function showErrorModal(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            openModal(errorModal);
+        }
+
+        // Modal de Datos
+        openDataModalButton.addEventListener('click', () => {
+            openModal(dataModal);
+        });
+
+        // Modal de Confirmación
+        function openConfirmModal(rowId) {
+            confirmModal.dataset.rowId = rowId; // Almacena el ID de la fila que se eliminará
+            openModal(confirmModal);
+        }
+
+        // Guardar datos desde el Modal de Datos
+        saveDataButton.addEventListener('click', () => {
+            // Captura y valida los datos ingresados
+            const fecha = document.getElementById('inputFecha').value;
+            const placa = document.getElementById('inputPlaca').value;
+            const cantidad = document.getElementById('inputCantidad').value;
+            const descripcion = document.getElementById('inputDescripcion').value;
+            const precio = document.getElementById('inputPrecio').value;
+            const estado = document.getElementById('inputEstado').value;
+            const empresa = document.getElementById('inputEmpresa').value;
+
+            if (!fecha || !placa || !cantidad || !descripcion || !precio || !estado || !empresa) {
+                showErrorModal('Todos los campos son obligatorios.');
+                return;
+            }
+
+            // Aquí agregarías la lógica para guardar los datos en la tabla
+            console.log('Datos guardados:', { fecha, placa, cantidad, descripcion, precio, estado, empresa });
+
+            closeModal(dataModal);
+        });
+
+        // Confirmar eliminación desde el Modal de Confirmación
+        confirmDeleteButton.addEventListener('click', () => {
+            const rowId = confirmModal.dataset.rowId;
+
+            if (rowId) {
+                // Aquí agregarías la lógica para eliminar la fila (por ejemplo, eliminar por ID)
+                console.log('Fila eliminada con ID:', rowId);
+            }
+
+            closeModal(confirmModal);
+        });
+
+        // Cerrar modales al hacer clic en botones de cerrar
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal-custom') || dataModal;
+                closeModal(modal);
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Selecciona todos los elementos con la clase "fullscreen-trigger"
+            const fullscreenButtons = document.querySelectorAll(".fullscreen-trigger");
+
+            fullscreenButtons.forEach(button => {
+                button.addEventListener("click", () => {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    } else if (document.documentElement.webkitRequestFullscreen) { // Safari
+                        document.documentElement.webkitRequestFullscreen();
+                    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+                        document.documentElement.msRequestFullscreen();
+                    }
+                });
+            });
+        });
+
+
+
+
+    </script>
+
+
+
+    <!-- Script de  -->
+
+    <script src="js/eventos.js"></script>
+    <script src="js/factura.js"></script>
+
+    <script src="js/pdf.js"></script>
+    <script src="js/correo.js"></script>
+    <script src="js/xslx.js"></script>
+
+</body>
+
+</html>
