@@ -865,12 +865,19 @@
 
 
         <!-- Modal de Datos -->
+        <!-- Modal de Datos (reemplaza tu modal actual con este bloque) -->
         <div class="modal-overlay" id="modalOverlay" style="display: none;">
             <div class="modalDT">
                 <div class="modal-header">
-                    <h5 class="modal-title">AGREGAR PRODUCTO AL INVENTARIO</h5>
+                    <h5 class="modal-title" id="modalTitle">AGREGAR PRODUCTO AL INVENTARIO</h5>
                     <button class="btn-close" id="closeModalButton">×</button>
                 </div>
+
+                <!-- Alerta superior dinámica (se muestra en el header) -->
+                <div id="duplicateMessage" class="duplicate-message" style="display: none;">
+                    ⚠️ La referencia ya existe en el inventario.
+                </div>
+
                 <div class="modal-body">
                     <div class="two-column-grid">
                         <div class="form-group">
@@ -878,6 +885,7 @@
                             <input type="date" class="form-control compact-input" id="inputFecha"
                                 onfocus="this.valueAsDate = new Date()" required>
                         </div>
+
                         <div class="form-group">
                             <label for="inputPlaca">Referencia</label>
                             <input type="text" id="inputPlaca" class="form-control compact-input input-mayusculas"
@@ -890,8 +898,9 @@
                         <input type="text" id="inputDescripcion" class="form-control compact-input input-sin-comas"
                             placeholder="Ej: Petuche" required>
                     </div>
+
                     <div class="form-group">
-                        <label for="inputUbicacionProducto">Ubicacion Producto</label>
+                        <label for="inputUbicacionProducto">Ubicación Producto</label>
                         <input type="text" id="inputUbicacionProducto"
                             class="form-control compact-input input-sin-comas" placeholder="Ej: Estante 3" required>
                     </div>
@@ -902,11 +911,13 @@
                             <input type="number" id="inputCantidad" class="form-control compact-input" placeholder="0"
                                 min="0" required>
                         </div>
+
                         <div class="form-group">
                             <label for="inputPrecio">P.Compra</label>
                             <input type="number" id="inputPrecio" class="form-control compact-input" placeholder="$"
                                 min="0" step="0.01" required>
                         </div>
+
                         <div class="form-group">
                             <label for="inputPrecioVenta">P.Venta</label>
                             <input type="number" id="inputPrecioVenta" class="form-control compact-input"
@@ -923,6 +934,7 @@
                                 <option value="agotado">Agotado</option>
                             </select>
                         </div>
+
                         <div class="form-group">
                             <label for="inputEmpresa">Marca</label>
                             <select id="inputEmpresa" class="form-control compact-input">
@@ -960,10 +972,12 @@
                                 <option value="SKF">SKF</option>
                                 <option value="PARCRAF">PARCRAF</option>
                                 <option value="TRASTEC">TRASTEC</option>
+
                             </select>
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelButton">Cancelar</button>
                     <button class="btn btn-primary" id="saveData">Guardar Producto</button>
@@ -971,6 +985,209 @@
             </div>
         </div>
 
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const STORAGE_KEY = "tableData";
+                const modalOverlay = document.getElementById("modalOverlay");
+                const modalTitleEl = document.getElementById("modalTitle");
+                const saveButton = document.getElementById("saveData");
+                const cancelButton = document.getElementById("cancelButton");
+                const closeButton = document.getElementById("closeModalButton");
+                const modalBody = document.querySelector(".modal-body");
+
+                let editRowIndex = null;
+
+                // === UTILIDADES ===
+                const getData = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+                const setData = (data) => localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+                const getToday = () => {
+                    const d = new Date();
+                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                };
+
+                // --- NUEVA FUNCIÓN PARA REINICIAR EL TEXTO DEL BOTÓN ---
+                function resetSaveButtonText() {
+                    saveButton.textContent = "Guardar Producto";
+                }
+
+                function fillForm(row) {
+                    document.getElementById("inputFecha").value = row.fecha || getToday();
+                    document.getElementById("inputPlaca").value = row.placa || "";
+                    document.getElementById("inputCantidad").value = row.cantidad || 0;
+                    document.getElementById("inputDescripcion").value = row.descripcion || "";
+                    document.getElementById("inputUbicacionProducto").value = row.ubicacion || "";
+                    document.getElementById("inputPrecio").value = row.precio || 0;
+                    document.getElementById("inputPrecioVenta").value = row.preciov || row.precioVenta || 0;
+                    document.getElementById("inputEstado").value = row.estado || "inventario";
+                    document.getElementById("inputEmpresa").value = row.empresa || row.Empresa || "Sin Marca";
+                }
+
+                function resetForm() {
+                    document.querySelectorAll(".form-control").forEach((el) => (el.value = ""));
+                    document.getElementById("inputFecha").value = getToday();
+                    document.getElementById("inputEstado").value = "inventario";
+                    document.getElementById("inputEmpresa").value = "Sin Marca";
+                    checkFormValidity();
+                    resetSaveButtonText(); // 🔑 Llamar aquí al reset del texto del botón
+                }
+
+                // --- VALIDACIÓN DE FORMULARIO ---
+                function checkFormValidity() {
+                    const requiredFields = modalBody.querySelectorAll("[required]");
+                    const isValid = Array.from(requiredFields).every(field => field.checkValidity());
+                    saveButton.disabled = !isValid;
+                    checkDuplicate(isValid);
+                }
+
+                // === ENCABEZADOS ===
+                function showDuplicateHeader(item, index) {
+                    modalTitleEl.innerHTML = `
+      <div class="alert-top" style="background:#fff3cd;border-left:5px solid #ffb300;padding:10px 15px;border-radius:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>⚠️ La referencia <b>${item.placa}</b> ya existe en el inventario.</div>
+          <button id="openEditBtn" class="btn-edit-exist" 
+            style="background:#007bff;color:white;border:none;padding:6px 12px;border-radius:6px;">Ver / Editar</button>
+        </div>
+      </div>
+    `;
+                    document.getElementById("openEditBtn").onclick = () => openEditModal(index);
+                }
+
+                function showEditingHeader(item) {
+                    modalTitleEl.innerHTML = `
+      <div class="alert-top" style="background:linear-gradient(90deg,#1976d2,#0288d1);color:white;padding:10px 15px;border-radius:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>✏️ Editando producto <b>${item.placa}</b></div>
+          <button id="cancelEditBtn" class="btn-cancel-edit" 
+            style="background:#e53935;color:white;border:none;padding:6px 12px;border-radius:6px;">Cancelar</button>
+        </div>
+      </div>
+    `;
+                    document.getElementById("cancelEditBtn").onclick = () => {
+                        editRowIndex = null;
+                        resetHeader();
+                        resetForm(); // Esto reinicia el texto del botón
+                    };
+                }
+
+                function resetHeader() {
+                    modalTitleEl.textContent = "AGREGAR PRODUCTO AL INVENTARIO";
+                }
+
+                // --- DETECTAR DUPLICADOS ---
+                function checkDuplicate(isFormValid = true) {
+                    const placa = document.getElementById("inputPlaca").value.trim().toUpperCase();
+                    const data = getData();
+                    const foundIndex = data.findIndex((r) => String(r.placa || "").toUpperCase() === placa);
+
+                    if (foundIndex !== -1 && editRowIndex === null) {
+                        showDuplicateHeader(data[foundIndex], foundIndex);
+                        saveButton.disabled = true;
+                    } else {
+                        resetHeader();
+                        saveButton.disabled = !isFormValid;
+                    }
+                }
+
+                // === ABRIR MODAL PARA EDITAR ===
+                function openEditModal(index) {
+                    const data = getData();
+                    const item = data[index];
+                    editRowIndex = index;
+                    fillForm(item);
+                    showEditingHeader(item);
+                    // 🔑 Establecer el texto de "Actualizar" solo al abrir el modo edición
+                    saveButton.textContent = "Añadir Producto Similar";
+                    saveButton.disabled = false;
+                    modalOverlay.style.display = "flex";
+                }
+
+                // === GUARDAR / ACTUALIZAR ===
+                saveButton.addEventListener("click", async (e) => {
+                    e.preventDefault();
+
+                    if (saveButton.disabled) {
+                        alert("Por favor, rellena todos los campos requeridos.");
+                        return;
+                    }
+
+                    const data = getData();
+                    const placa = document.getElementById("inputPlaca").value.trim().toUpperCase();
+
+                    const newItem = {
+                        id: editRowIndex !== null ? data[editRowIndex].id : "id_" + new Date().getTime(),
+                        fecha: document.getElementById("inputFecha").value || getToday(),
+                        placa,
+                        cantidad: parseFloat(document.getElementById("inputCantidad").value) || 0,
+                        descripcion: document.getElementById("inputDescripcion").value.trim(),
+                        ubicacion: document.getElementById("inputUbicacionProducto").value.trim(),
+                        precio: parseFloat(document.getElementById("inputPrecio").value) || 0,
+                        preciov: parseFloat(document.getElementById("inputPrecioVenta").value) || 0,
+                        estado: document.getElementById("inputEstado").value,
+                        empresa: document.getElementById("inputEmpresa").value.trim(),
+                    };
+
+                    // Reemplazar o agregar
+                    if (editRowIndex !== null) {
+                        data[editRowIndex] = newItem;
+                        if (typeof updateGoogleSheet === "function") {
+                            await updateGoogleSheet(newItem);
+                        }
+                    } else {
+                        const duplicateIndex = data.findIndex((r) => String(r.placa || "").toUpperCase() === placa);
+                        if (duplicateIndex !== -1) {
+                            data[duplicateIndex] = newItem;
+                            if (typeof updateGoogleSheet === "function") {
+                                await updateGoogleSheet(newItem);
+                            }
+                        } else {
+                            data.push(newItem);
+                            if (typeof addToGoogleSheet === "function") {
+                                await addToGoogleSheet(newItem);
+                            }
+                        }
+                    }
+
+                    setData(data);
+                    if (typeof cargarDatos === "function") cargarDatos();
+                    resetForm();
+                    resetHeader();
+                    editRowIndex = null;
+                    modalOverlay.style.display = "none";
+                });
+
+                // === CIERRE MODAL ===
+                [cancelButton, closeButton].forEach((btn) =>
+                    btn.addEventListener("click", () => {
+                        modalOverlay.style.display = "none";
+                        editRowIndex = null;
+                        resetForm(); // Esto reinicia el texto del botón y el formulario
+                        resetHeader();
+                    })
+                );
+
+                // === EVENTO DUPLICADOS Y VALIDACIÓN DE FORMULARIO ===
+                document.getElementById("inputPlaca").addEventListener("input", debounce(checkFormValidity, 200));
+                modalBody.addEventListener("input", checkFormValidity);
+
+                // === INICIALIZACIÓN ===
+                document.getElementById("inputFecha").value = getToday();
+                saveButton.disabled = true;
+                resetSaveButtonText(); // 🔑 Llamar al inicio para asegurar el texto inicial correcto
+
+                // === DÉBOUNCE ===
+                function debounce(fn, delay) {
+                    let t;
+                    return (...args) => {
+                        clearTimeout(t);
+                        t = setTimeout(() => fn(...args), delay);
+                    };
+                }
+
+                console.log("Gestor de inventario sincronizado con Google Sheets ✅");
+            });
+        </script>
 
 
         <!-- Modal de Confirmación de Eliminación -->
@@ -1507,3 +1724,4 @@
 </body>
 
 </html>
+
