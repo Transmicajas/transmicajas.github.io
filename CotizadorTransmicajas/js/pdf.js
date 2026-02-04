@@ -33,7 +33,7 @@ document
 document
   .querySelector(".closeW2")
   ?.addEventListener("click", () =>
-    closeModalwhatsapp("whatsappSelectionModal")
+    closeModalwhatsapp("whatsappSelectionModal"),
   );
 document
   .querySelector(".closeW3")
@@ -59,7 +59,7 @@ document.getElementById("generatePdfBtn").addEventListener("click", () => {
     nombreCliente,
     cedulaCliente,
     celularCliente,
-    direccionCliente
+    direccionCliente,
   );
 });
 
@@ -145,7 +145,7 @@ function enviarPDFaWhatsApp(numero) {
         let mensaje = encodeURIComponent(
           "🔧 *TRANSMICAJAS* 🔧 ha generado una nueva cuenta de cobro para ti: " +
             fileURL +
-            "\n\n🚛 *Especialistas en mecánica pesada y repuestos para camiones.*\n🧰 ¡Gracias por confiar en nosotros! *Estamos listos para ayudarte siempre.*"
+            "\n\n🚛 *Especialistas en mecánica pesada y repuestos para camiones.*\n🧰 ¡Gracias por confiar en nosotros! *Estamos listos para ayudarte siempre.*",
         );
 
         let whatsappLink = `https://api.whatsapp.com/send?phone=57${numero}&text=${mensaje}`;
@@ -174,7 +174,7 @@ async function generatePDF(
   nombreCliente,
   cedulaCliente,
   celularCliente,
-  direccionCliente
+  direccionCliente,
 ) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
@@ -230,7 +230,7 @@ async function generatePDF(
     contactBox.height,
     3,
     3,
-    "FD"
+    "FD",
   );
 
   // Contenido de contactos (perfectamente alineado)
@@ -247,17 +247,17 @@ async function generatePDF(
     contactBox.x + 5,
     contactBox.y + 8.5,
     contactBox.x + 60,
-    contactBox.y + 8.5
+    contactBox.y + 8.5,
   );
 
   // Elementos de contacto (iconos Unicode compatibles)
   doc.setFont("helvetica", "normal");
-  doc.text("Cel: 321 2707166", contactBox.x + 5, contactBox.y + 14);
+  doc.text("Cel: 321 316 08 24", contactBox.x + 5, contactBox.y + 14);
 
   // Email dividido si es necesario
   const emailText = doc.splitTextToSize(
     "Correo: transmicajas.oficial@gmail.com",
-    contactBox.width - 10
+    contactBox.width - 10,
   );
   doc.text(emailText, contactBox.x + 5, contactBox.y + 19);
 
@@ -290,9 +290,8 @@ async function generatePDF(
   doc.text("DATOS DEL EMISOR:", margin + 8, 70);
   doc.setFont("helvetica", "normal");
   doc.text("Almacén y Taller Transmicajas", margin + 8, 76);
-  doc.text("NIT: 74371241", margin + 8, 82);
-  doc.text("Cel: 321 2707166", margin + 8, 88);
-  doc.text("Duitama, Boyacá, Colombia", margin + 8, 94);
+  doc.text("Cel: 321 316 08 24", margin + 8, 82);
+  doc.text("Duitama, Boyacá, Colombia", margin + 8, 88);
 
   // Validez de la cotización
   doc.setFontSize(8);
@@ -315,7 +314,7 @@ async function generatePDF(
     clientPanel.height,
     3,
     3,
-    "F"
+    "F",
   );
   doc.setDrawColor(220, 220, 220);
   doc.roundedRect(
@@ -325,7 +324,7 @@ async function generatePDF(
     clientPanel.height,
     3,
     3,
-    "D"
+    "D",
   );
 
   // Contenido del panel del cliente
@@ -341,7 +340,7 @@ async function generatePDF(
     if (nombreCliente) {
       const nombreLines = doc.splitTextToSize(
         nombreCliente,
-        clientPanel.width - 15
+        clientPanel.width - 15,
       );
       doc.text("Nombre:", clientPanel.x + 5, currentY);
       doc.text(nombreLines, clientPanel.x + 25, currentY);
@@ -363,7 +362,7 @@ async function generatePDF(
     if (direccionCliente) {
       const direccionLines = doc.splitTextToSize(
         direccionCliente,
-        clientPanel.width - 15
+        clientPanel.width - 15,
       );
       doc.text("Dirección:", clientPanel.x + 5, currentY);
       doc.text(direccionLines, clientPanel.x + 25, currentY);
@@ -443,7 +442,7 @@ async function generatePDF(
             .trim()
             .replace("$", "")
             .replace(/\./g, "")
-            .replace(",", ".")
+            .replace(",", "."),
         ) || 0;
 
       totalSum += subtotal;
@@ -478,7 +477,7 @@ async function generatePDF(
         margin,
         startY + rowHeight + 2,
         pageWidth - margin,
-        startY + rowHeight + 2
+        startY + rowHeight + 2,
       );
 
       startY += rowHeight + 6;
@@ -530,7 +529,7 @@ async function generatePDF(
     startY + 28,
     {
       align: "right",
-    }
+    },
   );
 
   /*  const qrBase64 =
@@ -565,7 +564,7 @@ async function generatePDF(
       "Verifique autenticidad con el código QR",
       qrX + qrSize / 2,
       qrY + qrSize + 6,
-      { align: "center" }
+      { align: "center" },
     );
 
     const beneficios = [
@@ -608,7 +607,7 @@ async function generatePDF(
           day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
-        }
+        },
       )}`,
     ];
 
@@ -657,7 +656,7 @@ async function generatePDF(
       columnaDerechaX,
       qrY + qrSize + 2,
       columnaDerechaX + qrSize,
-      qrY + qrSize + 2
+      qrY + qrSize + 2,
     );
 
     doc.setFont("helvetica", "normal");
@@ -666,7 +665,7 @@ async function generatePDF(
       "Verifique autenticidad con el código QR",
       columnaDerechaX + qrSize / 2,
       qrY + qrSize + 6,
-      { align: "center" }
+      { align: "center" },
     );
 
     // 🟦 Dibujar beneficios en la izquierda
@@ -711,7 +710,7 @@ async function generatePDF(
       doc.text(
         text.substring(0, 90),
         columnaIzquierdaX + 1,
-        currentY + espacioEntreBeneficiosYFooter + i * 6
+        currentY + espacioEntreBeneficiosYFooter + i * 6,
       );
     });
   } else if (numFilas >= 8 && numFilas <= 10) {
@@ -743,14 +742,14 @@ async function generatePDF(
       doc.text(
         text.substring(0, 300), // cortar si es muy largo
         columnaIzquierdaX + 1,
-        currentY + i * 6 // espacio entre líneas
+        currentY + i * 6, // espacio entre líneas
       );
     });
   }
 
   // ===== GUARDAR DOCUMENTO =====
   const nombreArchivo = `Cotizacion_${cuenta || "SN"}_${formatFileName(
-    nombreCliente || "Cliente"
+    nombreCliente || "Cliente",
   )}.pdf`;
   doc.save(nombreArchivo);
 
@@ -763,7 +762,7 @@ async function generatePDF(
     nombreCliente,
     cedulaCliente,
     celularCliente,
-    direccionCliente
+    direccionCliente,
   );
   /*MODAL ALERTA FIN*/
   /*fimm reg*/
@@ -847,7 +846,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     contactBox.height,
     3,
     3,
-    "FD"
+    "FD",
   );
 
   // Contenido de contactos (perfectamente alineado)
@@ -864,17 +863,17 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     contactBox.x + 5,
     contactBox.y + 8.5,
     contactBox.x + 60,
-    contactBox.y + 8.5
+    contactBox.y + 8.5,
   );
 
   // Elementos de contacto (iconos Unicode compatibles)
   doc.setFont("helvetica", "normal");
-  doc.text("Cel: 321 2707166", contactBox.x + 5, contactBox.y + 14);
+  doc.text("Cel: 321 316 08 24", contactBox.x + 5, contactBox.y + 14);
 
   // Email dividido si es necesario
   const emailText = doc.splitTextToSize(
     "Correo: transmicajas.oficial@gmail.com",
-    contactBox.width - 10
+    contactBox.width - 10,
   );
   doc.text(emailText, contactBox.x + 5, contactBox.y + 19);
 
@@ -907,9 +906,8 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
   doc.text("DATOS DEL EMISOR:", margin + 8, 70);
   doc.setFont("helvetica", "normal");
   doc.text("Almacén y Taller Transmicajas", margin + 8, 76);
-  doc.text("NIT: 10000000", margin + 8, 82);
   doc.text("Duitama, Boyacá, Colombia", margin + 8, 88);
-  doc.text("Tel: 321 2707166", margin + 8, 94);
+  doc.text("Tel: 321 316 08 24", margin + 8, 94);
 
   // Validez de la cotización
   doc.setFontSize(8);
@@ -932,7 +930,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     clientPanel.height,
     3,
     3,
-    "F"
+    "F",
   );
   doc.setDrawColor(220, 220, 220);
   doc.roundedRect(
@@ -942,7 +940,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     clientPanel.height,
     3,
     3,
-    "D"
+    "D",
   );
 
   // Contenido del panel del cliente
@@ -956,7 +954,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     if (nombreCliente) {
       const nombreLines = doc.splitTextToSize(
         nombreCliente,
-        clientPanel.width - 15
+        clientPanel.width - 15,
       );
       doc.text("Nombre:", clientPanel.x + 5, clientPanel.y + 14);
       doc.text(nombreLines, clientPanel.x + 20, clientPanel.y + 14);
@@ -1039,7 +1037,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
             .trim()
             .replace("$", "")
             .replace(/\./g, "")
-            .replace(",", ".")
+            .replace(",", "."),
         ) || 0;
 
       totalSum += subtotal;
@@ -1074,7 +1072,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
         margin,
         startY + rowHeight + 2,
         pageWidth - margin,
-        startY + rowHeight + 2
+        startY + rowHeight + 2,
       );
 
       startY += rowHeight + 6;
@@ -1126,7 +1124,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     startY + 28,
     {
       align: "right",
-    }
+    },
   );
 
   // ===== SECCIÓN DE VALOR AÑADIDO =====
@@ -1157,7 +1155,7 @@ function generatePDFWhatsapp(fecha, cuenta, nombreCliente, cedulaCliente) {
     "Verifique autenticidad con el código QR",
     qrX + qrSize / 2,
     qrY + qrSize + 10,
-    { align: "center" }
+    { align: "center" },
   );
 
   const beneficios = [
@@ -1248,7 +1246,7 @@ async function generateLinkPdf(
   nombreCliente,
   cedulaCliente,
   celularCliente,
-  direccionCliente
+  direccionCliente,
 ) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
@@ -1304,7 +1302,7 @@ async function generateLinkPdf(
     contactBox.height,
     3,
     3,
-    "FD"
+    "FD",
   );
 
   // Contenido de contactos (perfectamente alineado)
@@ -1321,17 +1319,17 @@ async function generateLinkPdf(
     contactBox.x + 5,
     contactBox.y + 8.5,
     contactBox.x + 60,
-    contactBox.y + 8.5
+    contactBox.y + 8.5,
   );
 
   // Elementos de contacto (iconos Unicode compatibles)
   doc.setFont("helvetica", "normal");
-  doc.text("Cel: 321 2707166", contactBox.x + 5, contactBox.y + 14);
+  doc.text("Cel: 321 316 08 24", contactBox.x + 5, contactBox.y + 14);
 
   // Email dividido si es necesario
   const emailText = doc.splitTextToSize(
     "Correo: transmicajas.oficial@gmail.com",
-    contactBox.width - 10
+    contactBox.width - 10,
   );
   doc.text(emailText, contactBox.x + 5, contactBox.y + 19);
 
@@ -1366,7 +1364,7 @@ async function generateLinkPdf(
   doc.text("Almacén y Taller Transmicajas", margin + 8, 76);
   doc.text("NIT: 10000000", margin + 8, 82);
   doc.text("Duitama, Boyacá, Colombia", margin + 8, 88);
-  doc.text("Tel: 321 2707166", margin + 8, 94);
+  doc.text("Tel: 321 316 08 24", margin + 8, 94);
 
   // Validez de la cotización
   doc.setFontSize(8);
@@ -1389,7 +1387,7 @@ async function generateLinkPdf(
     clientPanel.height,
     3,
     3,
-    "F"
+    "F",
   );
   doc.setDrawColor(220, 220, 220);
   doc.roundedRect(
@@ -1399,7 +1397,7 @@ async function generateLinkPdf(
     clientPanel.height,
     3,
     3,
-    "D"
+    "D",
   );
 
   // Contenido del panel del cliente
@@ -1414,7 +1412,7 @@ async function generateLinkPdf(
     if (nombreCliente) {
       const nombreLines = doc.splitTextToSize(
         nombreCliente,
-        clientPanel.width - 15
+        clientPanel.width - 15,
       );
       doc.text("Nombre:", clientPanel.x + 5, currentY);
       doc.text(nombreLines, clientPanel.x + 25, currentY);
@@ -1436,7 +1434,7 @@ async function generateLinkPdf(
     if (direccionCliente) {
       const direccionLines = doc.splitTextToSize(
         direccionCliente,
-        clientPanel.width - 15
+        clientPanel.width - 15,
       );
       doc.text("Dirección:", clientPanel.x + 5, currentY);
       doc.text(direccionLines, clientPanel.x + 25, currentY);
@@ -1516,7 +1514,7 @@ async function generateLinkPdf(
             .trim()
             .replace("$", "")
             .replace(/\./g, "")
-            .replace(",", ".")
+            .replace(",", "."),
         ) || 0;
 
       totalSum += subtotal;
@@ -1544,7 +1542,7 @@ async function generateLinkPdf(
         margin,
         startY + rowHeight + 2,
         pageWidth - margin,
-        startY + rowHeight + 2
+        startY + rowHeight + 2,
       );
 
       startY += rowHeight + 6;
@@ -1596,7 +1594,7 @@ async function generateLinkPdf(
     startY + 28,
     {
       align: "right",
-    }
+    },
   );
 
   // ===== SECCIÓN DE VALOR AÑADIDO =====
@@ -1627,7 +1625,7 @@ async function generateLinkPdf(
     "Verifique autenticidad con el código QR",
     qrX + qrSize / 2,
     qrY + qrSize + 10,
-    { align: "center" }
+    { align: "center" },
   );
 
   const beneficios = [
@@ -1692,7 +1690,7 @@ async function generateLinkPdf(
   });
   // ===== GUARDAR DOCUMENTO =====
   const nombreArchivo = `Cotizacion_${cuenta || "SN"}_${formatFileName(
-    nombreCliente || "Cliente"
+    nombreCliente || "Cliente",
   )}.pdf`;
   /*doc.save(nombreArchivo);*/
 
@@ -1782,7 +1780,7 @@ async function generateLinkPdf(
       await cargarCotizaciones();
       // También puedes hacer scroll al contenedor de cotizaciones si lo deseas
       const contenedorCotizaciones = document.getElementById(
-        "contenedorCotizaciones"
+        "contenedorCotizaciones",
       );
       if (contenedorCotizaciones) {
         contenedorCotizaciones.scrollIntoView({ behavior: "smooth" });
